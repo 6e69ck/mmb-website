@@ -12,8 +12,23 @@ export function applyFaqUpdates(html) {
 
   students.text('Students').addClass('faq-audience-button');
   organizers.text('Organizers').addClass('faq-audience-button');
+  students.attr('href', '#students');
+  organizers.attr('href', '#organizers');
+  students.attr('data-faq-target', 'students');
+  organizers.attr('data-faq-target', 'organizers');
   const navigation = $('<nav class="faq-audience-navigation" aria-label="FAQ audiences"></nav>');
   navigation.append(students).append(organizers);
   container.replaceWith(navigation);
+  $('body').append(`<script>
+    document.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-faq-target]');
+      if (!button) return;
+      const target = document.getElementById(button.dataset.faqTarget);
+      if (!target) return;
+      event.preventDefault();
+      target.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' });
+      history.replaceState(null, '', button.getAttribute('href'));
+    });
+  </script>`);
   return $.html();
 }

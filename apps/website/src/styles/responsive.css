@@ -67,6 +67,10 @@ button.wsite-button { cursor: pointer; border: 0; }
 .wsite-form-container { width: 100%; }
 #wsite-content form .wsite-form-field { width: 100%; max-width: 100%; }
 #wsite-content form .wsite-form-input-container { width: 100%; max-width: none; }
+#wsite-content .wsite-form-radio-container { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; width: 100%; margin-top: 10px; }
+#wsite-content .wsite-form-radio-container .form-radio-container { display: inline-flex; align-items: center; gap: 9px; min-height: 42px; margin: 0; white-space: nowrap; }
+#wsite-content .wsite-form-radio-container input[type="radio"] { flex: 0 0 auto; width: 18px; height: 18px; margin: 0; }
+#wsite-content .wsite-form-radio-container label { margin: 0; line-height: 1.4; }
 #wsite-content form input.wsite-form-input, #wsite-content form textarea.wsite-form-input, #wsite-content form select { display: block; width: 100% !important; max-width: none !important; box-sizing: border-box; }
 #wsite-content form .wsite-name-field { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 16px; }
 #wsite-content form .wsite-name-field > .wsite-form-label, #wsite-content form .wsite-name-field > .wsite-form-instructions { grid-column: 1 / -1; }
