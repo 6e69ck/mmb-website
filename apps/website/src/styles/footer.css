@@ -1,0 +1,266 @@
+.site-footer {
+  margin-top: 0;
+  border-top: 3px solid var(--maroon, #7a003c);
+  background: #f7f4f5;
+  color: #40373c;
+  font-family: Montserrat, sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.site-footer a {
+  color: inherit;
+  text-decoration: none;
+  text-underline-offset: 4px;
+  transition: color 160ms ease;
+}
+
+.site-footer a:hover {
+  color: var(--maroon, #7a003c);
+  text-decoration: underline;
+}
+
+.site-footer p {
+  margin: 0;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.6;
+}
+
+.site-footer-main,
+.site-footer-bottom {
+  width: min(100%, 1280px);
+  margin-inline: auto;
+  padding-inline: 32px;
+}
+
+.site-footer-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr) minmax(0, .65fr);
+  gap: 40px;
+  align-items: start;
+  padding-block: 28px 24px;
+}
+
+.footer-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.footer-identity > div {
+  min-width: 0;
+}
+
+.footer-brand {
+  display: block;
+  flex: 0 0 64px;
+  line-height: 0;
+}
+
+.footer-brand img {
+  display: block;
+  width: 64px;
+  height: 64px;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.site-footer .footer-band-name {
+  display: inline-block;
+  margin-bottom: 4px;
+  color: var(--maroon, #7a003c);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.site-footer .footer-identity p {
+  margin-bottom: 4px;
+  color: #6b5d65;
+  font-size: 12px;
+}
+
+.footer-identity a[href^="mailto:"] {
+  display: inline-block;
+  padding-block: 4px;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+
+.footer-quick-links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 20px;
+  min-width: 0;
+}
+
+.footer-quick-links a,
+.footer-connect nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding-block: 5px;
+  line-height: 1.5;
+}
+
+.footer-connect {
+  min-width: 0;
+}
+
+.footer-connect > span {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--maroon, #7a003c);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.footer-connect nav {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 16px;
+}
+
+.footer-connect nav a {
+  gap: 5px;
+  font-size: 12px;
+}
+
+.footer-connect svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.25;
+}
+
+.site-footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px 24px;
+  padding-block: 13px;
+  border-top: 1px solid #e3dce0;
+  color: #6b5d65;
+  font-size: 11px;
+}
+
+.site-footer-bottom p {
+  flex-shrink: 1;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.site-footer-bottom nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0 18px;
+}
+
+.site-footer-bottom nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding-block: 5px;
+}
+
+@media (max-width: 1050px) {
+  .site-footer-main {
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: 18px 32px;
+  }
+
+  .footer-connect {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 24px;
+  }
+
+  .footer-connect > span {
+    margin-bottom: 0;
+  }
+
+  .footer-connect nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 20px;
+  }
+
+  .site-footer-bottom {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 600px) {
+  .site-footer-main,
+  .site-footer-bottom {
+    padding-inline: 20px;
+  }
+
+  .site-footer-main {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    padding-block: 22px 16px;
+  }
+
+  .footer-identity {
+    gap: 10px;
+  }
+
+  .footer-brand {
+    flex-basis: 48px;
+  }
+
+  .footer-brand img {
+    width: 48px;
+    height: 56px;
+  }
+
+  .site-footer .footer-band-name {
+    font-size: 14px;
+  }
+
+  .site-footer .footer-identity p,
+  .site-footer .footer-identity a[href^="mailto:"] {
+    font-size: 11px;
+  }
+
+  .footer-quick-links {
+    gap: 0 16px;
+  }
+
+  .footer-quick-links a,
+  .footer-connect nav a {
+    min-height: 34px;
+  }
+
+  .footer-connect {
+    gap: 2px 16px;
+  }
+
+  .footer-connect nav {
+    gap: 0 16px;
+  }
+
+  .site-footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 7px;
+    padding-block: 12px;
+  }
+
+  .site-footer-bottom nav {
+    justify-content: flex-start;
+    gap: 0 14px;
+  }
+}

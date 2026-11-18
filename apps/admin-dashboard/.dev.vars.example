@@ -1,0 +1,4 @@
+# Production requires Cloudflare Access, not a shared password.
+# Add these through `wrangler secret put` for the production Worker:
+ACCESS_TEAM_DOMAIN=https://YOUR-TEAM.cloudflareaccess.com
+ACCESS_AUD=YOUR-ACCESS-APPLICATION-AUDIENCE

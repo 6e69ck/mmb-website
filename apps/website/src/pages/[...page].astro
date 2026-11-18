@@ -1,0 +1,9 @@
+---
+import Page from '../layouts/Page.astro';
+import site from '../data/prepared-site.json';
+export function getStaticPaths() {
+  return site.pages.filter(page => page.path !== '/').map(page => ({ params: { page: page.path.slice(1).replace(/\.html$/, '') }, props: { page } }));
+}
+const { page } = Astro.props;
+---
+<Page page={page} />

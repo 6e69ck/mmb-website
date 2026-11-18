@@ -1,0 +1,44 @@
+
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  src: url("/original/31c026af05abbe58f72f.eot"); /* IE9 Compat Modes */
+  src: url("/original/c85dfcc9d4cf9eb3de07.eot") format('embedded-opentype'), /* IE6-IE8 */
+       url("/original/74adbf90b5de432f9282.woff2") format('woff2'), /* Super Modern Browsers */
+       url("/original/43f08aef38ba42d7b9ac.woff") format('woff'), /* Modern Browsers */
+       url("/original/43723a82b66b2e093e25.ttf") format('truetype'); /* Safari, Android, iOS */
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  src: url("/original/1650acc7ec5d88ab6d72.eot"); /* IE9 Compat Modes */
+  src: url("/original/d8e6d5a9c1fb96bd4b0f.eot") format('embedded-opentype'), /* IE6-IE8 */
+       url("/original/a425d7edbf5ab0aa9d64.woff2") format('woff2'), /* Super Modern Browsers */
+       url("/original/09c3df3d971d06252c9a.woff") format('woff'), /* Modern Browsers */
+       url("/original/60eed3ffe99309f4bbf4.ttf") format('truetype'); /* Safari, Android, iOS */
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  src: url("/original/bbdae1198133a5ea6cc8.eot"); /* IE9 Compat Modes */
+  src: url("/original/3899c343bdb72716f32c.eot") format('embedded-opentype'), /* IE6-IE8 */
+       url("/original/a04eca44fbc50676ea5a.woff2") format('woff2'), /* Super Modern Browsers */
+       url("/original/e05d381ef0a930fe8a24.woff") format('woff'), /* Modern Browsers */
+       url("/original/71e2f589e5556cf39fe7.ttf") format('truetype'); /* Safari, Android, iOS */
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 700;
+  src: url("/original/dc6be1b8c7edff565822.eot"); /* IE9 Compat Modes */
+  src: url("/original/2dc65c00d92bda76c8dd.eot") format('embedded-opentype'), /* IE6-IE8 */
+       url("/original/37b076b5d34d0399badb.woff2") format('woff2'), /* Super Modern Browsers */
+       url("/original/305ef1396502b0660f61.woff") format('woff'), /* Modern Browsers */
+       url("/original/12f3921f3c7f55b1d17c.ttf") format('truetype'); /* Safari, Android, iOS */
+}

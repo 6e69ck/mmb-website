@@ -1,0 +1,10 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "build": { "dependsOn": ["^build"], "outputs": ["dist/**"], "env": ["PUBLIC_GALLERY_API_URL"] },
+    "check": { "dependsOn": ["^check"], "outputs": [] },
+    "test": { "dependsOn": ["^build"], "outputs": [] },
+    "dev": { "cache": false, "persistent": true },
+    "preview": { "cache": false, "persistent": true }
+  }
+}

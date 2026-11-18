@@ -1,0 +1,30 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "mmb-admin-dashboard",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-11-17",
+  "workers_dev": false,
+  "preview_urls": false,
+  "assets": { "directory": "dist/client", "binding": "ASSETS", "not_found_handling": "single-page-application", "run_worker_first": true },
+  "routes": [
+    { "pattern": "admin.mmb.nickly.me", "custom_domain": true },
+    { "pattern": "media.mmb.nickly.me", "custom_domain": true }
+  ],
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "mmb-media" }],
+  "vars": {
+    "ENVIRONMENT": "production",
+    "ADMIN_EMAILS": "nickly88@pm.me",
+    "ADMIN_ORIGIN": "https://admin.mmb.nickly.me",
+    "PUBLIC_MEDIA_ORIGIN": "https://media.mmb.nickly.me"
+  },
+  "env": {
+    "local": {
+      "name": "mmb-admin-dashboard-local",
+      "workers_dev": false,
+      "routes": [],
+      "assets": { "directory": "public", "binding": "ASSETS", "run_worker_first": true },
+      "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "mmb-media" }],
+      "vars": { "ENVIRONMENT": "development", "DEV_AUTH": "true", "ADMIN_EMAILS": "nickly88@pm.me", "ADMIN_ORIGIN": "http://127.0.0.1:5174", "PUBLIC_MEDIA_ORIGIN": "http://127.0.0.1:8787" }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "$schema": "../admin-dashboard/node_modules/wrangler/config-schema.json",
+  "name": "mmb-website",
+  "compatibility_date": "2026-11-18",
+  "pages_build_output_dir": ".pages-dist",
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "mmb-media" }]
+}

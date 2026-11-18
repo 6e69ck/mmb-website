@@ -1,0 +1,29 @@
+{
+  "name": "mmb-monorepo",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.26.2",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "node scripts/build.mjs",
+    "check": "turbo run check",
+    "test": "turbo run test",
+    "test:batch-upload": "node scripts/batch-upload-qa.mjs",
+    "dev:website": "pnpm --filter @mmb/website dev",
+    "dev:admin": "pnpm --filter @mmb/admin-dashboard dev",
+    "dev:bot": "pnpm --filter @mmb/discord-bot dev",
+    "bot:check-config": "pnpm --filter @mmb/discord-bot exec tsx src/index.ts --check-config",
+    "gallery:migrate": "pnpm --filter @mmb/admin-dashboard gallery:migrate",
+    "images:migrate": "pnpm --filter @mmb/admin-dashboard images:migrate",
+    "deploy:admin": "pnpm --filter @mmb/admin-dashboard deploy",
+    "deploy:pages": "node scripts/deploy-pages.mjs",
+    "deploy:website": "node scripts/deploy-pages.mjs --website",
+    "cloudflare:setup": "node scripts/cloudflare-setup.mjs",
+    "cloudflare:access": "node scripts/configure-access.mjs",
+    "gallery:seed-local": "pnpm --filter @mmb/admin-dashboard gallery:seed-local"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.0",
+    "typescript": "^6.0.3"
+  }
+}

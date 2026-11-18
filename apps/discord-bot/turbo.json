@@ -1,0 +1,11 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "dev": {
+      "passThroughEnv": [
+        "DISCORD_BOT_TOKEN", "DISCORD_UPLOAD_CHANNEL", "DISCORD_UPLOAD_CHANNEL_ID",
+        "ACCESS_KEY_ID", "ACCESS_KEY_SECRET", "R2_ENDPOINT"
+      ]
+    }
+  }
+}

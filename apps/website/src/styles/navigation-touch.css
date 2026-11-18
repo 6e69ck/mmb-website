@@ -1,0 +1,43 @@
+/* The collapsed menu uses the complete row as its touch target. Desktop
+   dropdown placement and delayed hover behavior remain in responsive.css. */
+@media (max-width: 1240px) {
+  .site-navigation > nav {
+    padding-inline: 0;
+  }
+
+  .site-navigation .site-menu-link {
+    width: 100%;
+    gap: 0;
+    align-items: stretch;
+  }
+
+  .site-navigation .site-menu-link > a {
+    display: flex;
+    flex: 1 1 0;
+    align-items: center;
+    min-width: 0;
+    min-height: 48px;
+    padding: 12px 24px;
+    white-space: normal;
+  }
+
+  /* A parent link fills the row up to the separate disclosure control,
+     keeping its destination reachable without changing native semantics. */
+  .site-navigation .site-menu-link > .submenu-disclosure > summary {
+    flex: 0 0 60px;
+    width: 60px;
+    min-width: 60px;
+    min-height: 48px;
+    padding: 0;
+  }
+
+  .site-navigation .more-disclosure {
+    width: 100%;
+  }
+
+  .site-navigation .more-disclosure > summary {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 24px;
+  }
+}

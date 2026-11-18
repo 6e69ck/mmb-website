@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "mmb-admin-dashboard",
+  "compatibility_date": "2026-11-17",
+  "pages_build_output_dir": "dist/client",
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "mmb-media" }],
+  "vars": {
+    "ENVIRONMENT": "production",
+    "ADMIN_EMAILS": "nickly88@pm.me",
+    "ADMIN_ORIGIN": "https://admin.mmb.nickly.me",
+    "PUBLIC_MEDIA_ORIGIN": "https://mmb.nickly.me"
+  }
+}

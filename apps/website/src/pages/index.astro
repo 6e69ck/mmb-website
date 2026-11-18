@@ -1,0 +1,5 @@
+---
+import Page from '../layouts/Page.astro';
+import site from '../data/prepared-site.json';
+---
+<Page page={site.pages.find(page => page.path === '/')} />

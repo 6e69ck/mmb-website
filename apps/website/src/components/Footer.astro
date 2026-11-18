@@ -1,0 +1,27 @@
+---
+import site from '../data/prepared-site.json';
+import images from '../data/images.json';
+const logo = images[site.logo as keyof typeof images];
+const links = [
+  ['Join the band', '/join.html'], ['Contact Us', '/contact.html'], ['FAQ', '/faq.html'],
+  ['Our Team', '/our-team.html'], ['Gallery', '/gallery.html'], ['Upcoming Events', '/events.html'],
+  ['Alumni', '/alumni.html'], ['Videos', '/gallery.html?type=videos'],
+];
+const social = [
+  ['Instagram', 'https://instagram.com/macmarchingband/'],
+  ['Facebook', 'https://www.facebook.com/mcmastermarchingband/'],
+  ['YouTube', 'https://www.youtube.com/channel/UCoKrivdTqNIxKAjAr3luvGw'],
+  ['Twitter', 'https://twitter.com/macmarchingband'],
+];
+---
+<footer class="site-footer">
+  <div class="site-footer-main">
+    <div class="footer-identity">
+      <a href="/" aria-label="Home" class="footer-brand"><picture><source media="(scripting: none)" srcset={site.logo} /><img src={logo.placeholder} data-image-src={site.logo} data-blurhash={logo.hash} width={logo.width} height={logo.height} alt="MMB" loading="lazy" decoding="async" /></picture></a>
+      <div><a class="footer-band-name" href="/">McMaster Marching Band</a><p>McMaster University · Hamilton, ON</p><a href="mailto:admin@mcmastermarchingband.com">admin@mcmastermarchingband.com</a></div>
+    </div>
+    <nav class="footer-quick-links" aria-label="Footer">{links.map(([label, href]) => <a href={href}>{label}</a>)}</nav>
+    <div class="footer-connect"><span>Stay connected</span><nav aria-label="Social media">{social.map(([label, href]) => <a href={href} target="_blank" rel="noopener noreferrer">{label}<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12 12 4M4 4h8v8" /></svg></a>)}</nav></div>
+  </div>
+  <div class="site-footer-bottom"><p>Copyright © 2026 McMaster Marching Band | All Rights Reserved</p><nav aria-label="Band documents"><a href="/budget.html">Budget</a><a href="/constitution.html">Constitution</a><a href="/executive-meeting-minutes.html">Executive Meeting Minutes</a></nav></div>
+</footer>

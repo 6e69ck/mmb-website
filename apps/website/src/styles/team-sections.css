@@ -1,0 +1,102 @@
+#wsite-content .team-group-heading {
+  margin: 0 0 30px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--maroon, #7a003c);
+  text-align: left;
+}
+
+.team-executives .wsite-section-elements > .team-group-heading + .wsite-spacer {
+  display: none;
+}
+
+.team-leaders > .wsite-section {
+  background: #e9e9e9;
+}
+
+.team-executive-members .wsite-section-elements > div + div {
+  margin-top: 32px;
+}
+
+.team-leader-grid {
+  display: block;
+}
+
+.team-leader-row + .team-leader-row {
+  margin-top: 32px;
+}
+
+.team-leader-profile {
+  min-width: 0;
+  border: 0;
+  background: transparent;
+}
+
+.team-placeholder-portrait {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 365px;
+  max-width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  margin: 0 auto;
+  background: #f2edef;
+}
+
+.team-placeholder-head {
+  position: absolute;
+  top: 20%;
+  width: 14%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #d8cbd1;
+}
+
+.team-placeholder-body {
+  position: absolute;
+  top: 48%;
+  width: 30%;
+  height: 31%;
+  border-radius: 50% 50% 0 0;
+  background: #d8cbd1;
+}
+
+/* Keep the explicit 2 × 2 Section Leaders layout even when the original
+   executive profile tables stack on narrow screens. */
+@media (max-width: 767px) {
+  #wsite-content .team-leader-grid .wsite-multicol-table {
+    display: table;
+    table-layout: fixed;
+    width: 100% !important;
+  }
+
+  #wsite-content .team-leader-grid .wsite-multicol-tbody {
+    display: table-row-group;
+  }
+
+  #wsite-content .team-leader-grid .wsite-multicol-tr {
+    display: table-row;
+  }
+
+  #wsite-content .team-leader-grid .team-leader-profile {
+    display: table-cell;
+    width: 50% !important;
+    padding: 0 8px !important;
+    margin-bottom: 0;
+    vertical-align: top;
+  }
+
+  #wsite-content .team-leader-grid .wsite-multicol-table-wrap {
+    margin: 0 -8px !important;
+  }
+
+  #wsite-content .team-leader-profile h2 {
+    font-size: clamp(18px, 5vw, 25px) !important;
+  }
+
+  .team-leader-row + .team-leader-row {
+    margin-top: 24px;
+  }
+}
+

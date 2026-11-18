@@ -1,0 +1,12 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/apps/website/public/original/f0590551705610cd6f12.woff2",
+        "$TURBO_ROOT$/apps/website/public/original/e3eaef581648e55226f1.woff2"
+      ]
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "@mmb/discord-bot",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.12.0" },
+  "scripts": {
+    "dev": "tsx watch --include ../../.env src/index.ts --allow-missing",
+    "start": "node dist/index.js",
+    "build": "node scripts/build.mjs",
+    "check": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1171.0",
+    "@mmb/gallery": "workspace:*",
+    "blurhash": "^2.0.5",
+    "discord.js": "^14.28.1",
+    "sharp": "^0.35.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "esbuild": "^0.28.2",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3",
+    "vitest": "^3.0.0"
+  }
+}

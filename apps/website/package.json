@@ -1,0 +1,32 @@
+{
+  "dependencies": {
+    "@astrojs/react": "^7.1.9",
+    "astro": "^7.4.12",
+    "blurhash": "^2.0.5",
+    "cheerio": "^1.2.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "sharp": "^0.35.5",
+    "@mmb/gallery": "workspace:*"
+  },
+  "name": "@mmb/website",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev --host 127.0.0.1 --port 4323 --ignore-lock",
+    "capture": "node scripts/capture-source.mjs",
+    "build": "node scripts/build.mjs",
+    "preview": "astro preview --host 0.0.0.0",
+    "verify": "node scripts/verify-site.mjs",
+    "check": "astro check",
+    "test:browser": "node scripts/browser-qa.mjs"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@playwright/test": "^1.65.1",
+    "@sparticuz/chromium": "^153.0.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "^6.0.3"
+  }
+}

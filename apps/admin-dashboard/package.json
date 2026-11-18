@@ -1,0 +1,18 @@
+{
+  "name": "@mmb/admin-dashboard",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently --kill-others-on-fail --names dashboard,api \"vite --host 127.0.0.1 --port 5174 --strictPort\" \"wrangler dev --env local --port 8787 --ip 127.0.0.1 --persist-to .wrangler/state\"",
+    "build": "vite build && wrangler deploy --dry-run --env=\"\" --outdir dist/worker",
+    "check": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p worker/tsconfig.json",
+    "test": "vitest run && node scripts/r2-s3.check.mjs",
+    "deploy": "node ../../scripts/deploy-pages.mjs --admin",
+    "gallery:migrate": "node scripts/migrate-gallery.mjs",
+    "images:migrate": "node scripts/migrate-site-images.mjs",
+    "gallery:seed-local": "node scripts/migrate-gallery.mjs --local"
+  },
+  "dependencies": { "@mmb/gallery": "workspace:*", "react": "^19.3.1", "react-dom": "^19.3.1", "blurhash": "^2.0.5", "jose": "^6.0.0" },
+  "devDependencies": { "@cloudflare/workers-types": "^5.20261117.1", "@types/react": "^19.3.0", "@types/react-dom": "^19.3.0", "@vitejs/plugin-react": "^5.0.0", "concurrently": "^9.0.0", "typescript": "^6.0.3", "vite": "^7.0.0", "vitest": "^3.0.0", "wrangler": "^4.132.0" }
+}
