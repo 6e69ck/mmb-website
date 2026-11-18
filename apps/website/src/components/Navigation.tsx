@@ -68,7 +68,7 @@ function Branch({ items, current, depth = 0 }: { items: Item[]; current: string;
     {items.map(item => <MenuItem key={item.href} item={item} current={current} depth={depth} />)}
   </ul>;
 }
-export default function Navigation({ items, current, logo, placeholder, hash, width, height }: { items: Item[]; current: string; logo: string; placeholder: string; hash: string; width: number; height: number }) {
+export default function Navigation({ items, current, logo, width, height }: { items: Item[]; current: string; logo: string; width: number; height: number }) {
   const ref = useRef<HTMLElement>(null);
   const join = items.find(item => item.href === '/join.html');
   const morePaths = new Set(['/budget.html', '/constitution.html', '/executive-meeting-minutes.html']);
@@ -99,7 +99,7 @@ export default function Navigation({ items, current, logo, placeholder, hash, wi
   }, []);
   return <header className="site-header" ref={ref}>
     <div className="site-header-inner">
-      <a className="site-brand" href="/" aria-label="Home"><picture><source media="(scripting: none)" srcSet={logo} /><img src={placeholder} data-image-src={logo} data-blurhash={hash} alt="MMB" width={width} height={height} fetchPriority="high" /></picture></a>
+      <a className="site-brand" href="/" aria-label="Home"><img src={logo} width={width} height={height} alt="MMB" fetchPriority="high" /></a>
       <details className="site-navigation" open>
         <summary className="menu-toggle" aria-label="Menu"><span /><span /><span /></summary>
         <nav aria-label="Menu"><Branch items={menuItems} current={current} /></nav>

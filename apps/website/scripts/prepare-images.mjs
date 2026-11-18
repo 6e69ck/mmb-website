@@ -40,10 +40,8 @@ function enhance(html) {
     const style = img.attr('style') || '';
     if (/\bwidth\s*:\s*auto\b/i.test(style)) img.attr('style', style.replace(/\bwidth\s*:\s*auto\b/i, `width:${image.width}px`));
     img.attr('width', image.width).attr('height', image.height);
-    img.attr('data-blurhash', image.hash).attr('data-image-src', src).attr('src', image.placeholder);
-    // Native picture fallback keeps the original images available without JavaScript.
-    img.wrap('<picture class="progressive-picture"></picture>');
-    img.before($('<source media="(scripting: none)">').attr('srcset', src));
+    img.attr('data-blurhash', image.hash);
+    img.attr('style', [img.attr('style'), `--image-placeholder: url('${image.placeholder}')`].filter(Boolean).join('; '));
   });
   $('[style*="background-image"]').each((_, el) => {
     const node = $(el);
@@ -51,8 +49,7 @@ function enhance(html) {
     const path = style.match(/background-image:\s*url\(['"]?([^)'"\s]+)['"]?\)/)?.[1];
     if (!path || !images[path]) return;
     node.attr('data-blurhash-background', images[path].hash).attr('data-background-src', path);
-    node.attr('style', style.replace(/background-image:\s*url\([^)]*\)/, `background-image: url('${images[path].placeholder}')`));
-    node.append(`<noscript><style>[data-background-src="${path}"]{background-image:url('${path}')!important}</style></noscript>`);
+    node.attr('style', style.replace(/background-image:\s*url\([^)]*\)/, `background-image: url('${path}'), url('${images[path].placeholder}')`));
   });
   $('form').each((_, el) => {
     const form = $(el);

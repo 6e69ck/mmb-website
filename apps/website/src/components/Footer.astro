@@ -17,7 +17,7 @@ const social = [
 <footer class="site-footer">
   <div class="site-footer-main">
     <div class="footer-identity">
-      <a href="/" aria-label="Home" class="footer-brand"><picture><source media="(scripting: none)" srcset={site.logo} /><img src={logo.placeholder} data-image-src={site.logo} data-blurhash={logo.hash} width={logo.width} height={logo.height} alt="MMB" loading="lazy" decoding="async" /></picture></a>
+      <a href="/" aria-label="Home" class="footer-brand"><img src={site.logo} width={logo.width} height={logo.height} alt="MMB" loading="lazy" /></a>
       <div><a class="footer-band-name" href="/">McMaster Marching Band</a><p>McMaster University · Hamilton, ON</p><a href="mailto:admin@mcmastermarchingband.com">admin@mcmastermarchingband.com</a></div>
     </div>
     <nav class="footer-quick-links" aria-label="Footer">{links.map(([label, href]) => <a href={href}>{label}</a>)}</nav>

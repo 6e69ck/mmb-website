@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import type { GalleryIndex, GalleryPhoto, GalleryVideo, MediaFilter } from '@mmb/gallery';
 
 type Photo = Pick<GalleryPhoto, 'kind' | 'src' | 'thumbnail' | 'width' | 'height' | 'hash' | 'placeholder' | 'caption' | 'alt'> & Partial<GalleryPhoto>;
@@ -221,7 +221,7 @@ function VideoTile({ item }: { item: Video }) {
 function PhotoTile({ photo, year, index }: { photo: Photo; year: number | null; index: number }) {
   return <figure className="mosaic-tile">
     <a href={photo.src} rel={`lightbox[year-${year}]`} title={photo.caption || undefined} aria-label={photo.caption || photo.alt || `Open photo ${index + 1}${year === null ? '' : ` from ${year}`}`}>
-      <picture className="progressive-picture"><source media="(scripting: none)" srcSet={photo.thumbnail} /><img src={photo.placeholder} data-image-src={photo.thumbnail} data-blurhash={photo.hash} width={photo.width} height={photo.height} alt={photo.alt} loading="lazy" decoding="async" /></picture>
+      <img key={photo.thumbnail} src={photo.thumbnail} data-blurhash={photo.hash} style={{ '--image-placeholder': `url("${photo.placeholder}")` } as CSSProperties} width={photo.width} height={photo.height} alt={photo.alt} loading="lazy" decoding="async" />
     </a>
     {photo.caption && <figcaption>{photo.caption}</figcaption>}
   </figure>;

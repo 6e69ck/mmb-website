@@ -47,12 +47,12 @@ summary::-webkit-details-marker { display: none; }
 .wsite-youtube-container iframe { position: absolute; inset: 0; width: 100%; height: 100%; }
 iframe { max-width: 100%; }
 .wsite-section-bg-image { background-position: center !important; }
-img[data-blurhash] { color: transparent; }
-img[data-image-ready="true"] { animation: image-reveal .4s ease-out; }
+@media (scripting: enabled) {
+  img[data-blurhash]:not([data-image-ready]) {
+    background: var(--image-placeholder) center / 100% 100% no-repeat;
+  }
+}
 @keyframes image-reveal { from { filter: blur(6px); } to { filter: blur(0); } }
-[data-blurhash-background] { position: relative; isolation: isolate; }
-[data-blurhash-background]::before { content: ''; position: absolute; inset: 0; z-index: -1; background-image: var(--loaded-background); background-size: inherit; background-position: center; background-repeat: inherit; opacity: 0; transition: opacity .5s ease; }
-[data-background-ready="true"]::before { opacity: 1; }
 .imageGallery { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; height: auto !important; }
 .imageGallery > div { width: auto !important; float: none !important; }
 .imageGallery > span { display: none !important; }

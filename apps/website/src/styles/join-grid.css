@@ -13,11 +13,6 @@
   object-fit: cover;
 }
 
-.join-ensemble-card-photo picture {
-  display: block;
-  height: 100%;
-}
-
 .join-ensemble-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

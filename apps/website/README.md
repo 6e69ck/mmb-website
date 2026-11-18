@@ -47,7 +47,7 @@ This updates the captured content and assets to the source website's current sta
 
 ## Images and interaction
 
-Images begin with PNGs decoded from their BlurHashes and reserve their original dimensions. React preloads and decodes nearby images before revealing them. Background images crossfade from their placeholders. Native `<picture>` sources provide full images when JavaScript is disabled.
+Images use their real URLs and reserve their original dimensions. A BlurHash background fills the space while a photo loads and is cleared when the image is ready. Section backgrounds layer the original image over their placeholder, and the site logos load directly.
 
 The photo viewer supports previous/next controls, arrow keys, Escape, focus return, and native dialog focus containment. Desktop dropdowns open after 200ms hover and close after 180ms; native disclosure elements retain keyboard/touch support. Mobile navigation rows provide full-width touch targets. Media links directly to the combined gallery. Reduced-motion preferences are honored.
 

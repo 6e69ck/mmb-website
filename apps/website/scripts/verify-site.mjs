@@ -51,11 +51,13 @@ for (const page of site.pages) {
   assert.equal(built('title').text(), original('title').text(), `${file}: title changed`);
   for (const img of built('img').toArray()) {
     const node = built(img);
-    assert.ok(isBlurhashValid(node.attr('data-blurhash') || '').result, `${file}: missing BlurHash`);
-    assert.ok(node.attr('src').startsWith('data:image/png;base64,'), `${file}: missing placeholder`);
+    if (node.attr('src') !== site.logo) {
+      assert.ok(isBlurhashValid(node.attr('data-blurhash') || '').result, `${file}: missing BlurHash`);
+      assert.match(node.attr('style') || '', /--image-placeholder:.*data:image\/png;base64,/, `${file}: missing placeholder`);
+    }
     assert.ok(node.attr('width') && node.attr('height'), `${file}: missing image dimensions`);
-    assert.ok(node.parent('picture').children('source[media="(scripting: none)"]').length, `${file}: missing no-JS fallback`);
-    await access(`dist${node.attr('data-image-src')}`);
+    assert.ok(node.attr('src')?.startsWith('/'), `${file}: missing native image source`);
+    await access(`dist${node.attr('src')}`);
     imageCount++;
   }
   for (const el of built('[href], [data-background-src]').toArray()) {

@@ -9,39 +9,6 @@ export default function ImageExperience() {
   const trigger = useRef<HTMLElement | null>(null);
   const request = useRef(0);
   useEffect(() => {
-    const inFlight = new Set<HTMLElement>();
-    const load = async (node: HTMLElement) => {
-      if (inFlight.has(node)) return;
-      inFlight.add(node);
-      const src = node.dataset.imageSrc || node.dataset.backgroundSrc;
-      if (!src) return;
-      const img = new Image(); img.src = src;
-      try {
-        await img.decode();
-        if (node instanceof HTMLImageElement) {
-          node.src = src;
-          await node.decode();
-          node.dataset.imageReady = 'true';
-        } else {
-          node.style.setProperty('--loaded-background', `url("${src}")`);
-          node.dataset.backgroundReady = 'true';
-        }
-      } catch { inFlight.delete(node); }
-    };
-    const observer = new IntersectionObserver(entries => {
-      for (const entry of entries) if (entry.isIntersecting) {
-        void load(entry.target as HTMLElement); observer.unobserve(entry.target);
-      }
-    }, { rootMargin: '400px' });
-    document.querySelectorAll<HTMLElement>('[data-image-src], [data-background-src]').forEach(node => observer.observe(node));
-    const mutations = new MutationObserver(records => {
-      for (const record of records) for (const node of record.addedNodes) {
-        if (!(node instanceof HTMLElement)) continue;
-        if (node.matches('[data-image-src], [data-background-src]')) observer.observe(node);
-        node.querySelectorAll<HTMLElement>('[data-image-src], [data-background-src]').forEach(image => observer.observe(image));
-      }
-    });
-    mutations.observe(document.body, { childList: true, subtree: true });
     const click = (event: MouseEvent) => {
       if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button !== 0) return;
       const a = (event.target as Element).closest<HTMLAnchorElement>('a[rel^="lightbox"], .wsite-image a[href]');
@@ -54,7 +21,7 @@ export default function ImageExperience() {
       trigger.current = a;
     };
     document.addEventListener('click', click);
-    return () => { observer.disconnect(); mutations.disconnect(); document.removeEventListener('click', click); };
+    return () => document.removeEventListener('click', click);
   }, []);
   useEffect(() => {
     if (!gallery.length) return;

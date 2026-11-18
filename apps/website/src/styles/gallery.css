@@ -30,7 +30,6 @@
 #wsite-content .mosaic-video-note { margin: 10px 0 0; font-size: 12px !important; line-height: 1.65 !important; }
 .mosaic-tile { display: block; position: relative; margin: 0 0 12px; break-inside: avoid; overflow: hidden; background: #eee8eb; }
 .mosaic-tile a { display: block; position: relative; overflow: hidden; }
-.mosaic-tile picture { display: block; }
 #wsite-content .mosaic-tile img { display: block; width: 100%; height: auto; margin: 0; transition: transform .4s ease; }
 .mosaic-tile a:hover img { transform: scale(1.035); }
 .mosaic-tile figcaption { position: absolute; inset: auto 0 0; padding: 32px 14px 14px; background: linear-gradient(transparent, #260d20d9); color: #fff; font: 500 12px/1.6 Montserrat, sans-serif; opacity: 0; transform: translateY(6px); transition: opacity .2s ease, transform .2s ease; pointer-events: none; }

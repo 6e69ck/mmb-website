@@ -31,6 +31,11 @@ const galleryApiBase = import.meta.env.PUBLIC_GALLERY_API_URL || (import.meta.en
     <title>{page.title}</title>
     <link rel="icon" type="image/png" href={site.logo} />
     <link rel="canonical" href={new URL(page.path, Astro.site || site.origin)} />
+    <script is:inline>
+      document.addEventListener('load', (event) => {
+        if (event.target instanceof HTMLImageElement) event.target.dataset.imageReady = 'true';
+      }, true);
+    </script>
     {page.stylesheets.map((href: string) => <link rel="stylesheet" href={href} />)}
     {page.inlineStyles.map((css: string) => <style is:inline set:html={css} />)}
     <style is:inline set:html={responsiveCss} />
@@ -42,7 +47,7 @@ const galleryApiBase = import.meta.env.PUBLIC_GALLERY_API_URL || (import.meta.en
     <style is:inline set:html={faqCss} />
   </head>
   <body class={page.bodyClass}>
-    <Navigation items={site.navigation} current={page.path} logo={site.logo} {...logo} client:load />
+    <Navigation items={site.navigation} current={page.path} logo={site.logo} width={logo.width} height={logo.height} client:load />
     <main id="main-content" tabindex="-1" class="main-wrap">
       <Fragment set:html={page.bannerHtml} />
       {isGallery ? <div id="wsite-content" class="wsite-elements wsite-not-footer"><Gallery years={galleryData.years} photoYears={galleryData.photoYears} videoYears={galleryData.videoYears} initialYear={initialYear} initialType={initialType} initialItems={galleryData.albums[String(initialYear) as keyof typeof galleryData.albums] as MediaItem[]} preferredYear={preferredYear} apiBase={galleryApiBase} client:load /></div> : <div id="wsite-content" class="wsite-elements wsite-not-footer" set:html={page.contentHtml} />}
