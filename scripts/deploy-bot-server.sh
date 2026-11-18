@@ -11,16 +11,29 @@ fail() { printf 'Deploy stopped: %s\n' "$*" >&2; exit 1; }
 [[ "$deploy_dir" = /* && "$deploy_dir" != / ]] || fail 'The deploy directory must be an absolute path other than /.'
 [[ "$repo_url" = git@*:* || "$repo_url" = ssh://* ]] || fail 'Use an SSH Git remote.'
 
-# Noninteractive SSH sessions do not always load the user's NVM setup.
-if [[ -s "$HOME/.nvm/nvm.sh" ]]; then
+# Preserve a compatible system Node: sourcing NVM normally switches to its
+# default, which may be older than the Node already selected by SSH's PATH.
+node_compatible() {
+  "${1:-node}" -e 'const [major, minor] = process.versions.node.split(".").map(Number); process.exit(major > 22 || (major === 22 && minor >= 12) ? 0 : 1);' >/dev/null 2>&1
+}
+nvm_directory="${NVM_DIR:-$HOME/.nvm}"
+if ! node_compatible && [[ -s "$nvm_directory/nvm.sh" ]]; then
   set +u
   # shellcheck disable=SC1091
-  source "$HOME/.nvm/nvm.sh"
+  source "$nvm_directory/nvm.sh" --no-use
   set -u
+  while IFS= read -r candidate; do
+    [[ -x "$candidate/bin/node" ]] || continue
+    if node_compatible "$candidate/bin/node"; then
+      nvm use --silent "${candidate##*/}"
+      break
+    fi
+  done < <(printf '%s\n' "$nvm_directory"/versions/node/v* | sort -Vr)
 fi
-for tool in git node pm2 flock; do command -v "$tool" >/dev/null || fail "Install $tool for the deploy user first."; done
+for tool in git node pm2 flock; do command -v "$tool" >/dev/null || fail "Install $tool for the deploy user on $(hostname) first."; done
 git check-ref-format "refs/heads/$deploy_branch" >/dev/null
-node -e 'const [major, minor] = process.versions.node.split(".").map(Number); if (major < 22 || (major === 22 && minor < 12)) { console.error("Node.js 22.12 or newer is required."); process.exit(1); }'
+printf 'Remote runtime on %s: %s (%s)\n' "$(hostname)" "$(node --version)" "$(command -v node)"
+node_compatible || fail "Node.js 22.12 or newer is required on $(hostname); selected $(node --version) at $(command -v node). Install a compatible server runtime."
 if command -v corepack >/dev/null; then pnpm_cmd=(corepack pnpm);
 elif command -v pnpm >/dev/null; then pnpm_cmd=(pnpm);
 else fail 'Install pnpm or Corepack for the deploy user first.'; fi

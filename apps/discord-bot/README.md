@@ -45,7 +45,7 @@ The deploy command targets `dev@192.18.151.14`, checks out the full `origin` rep
 
 One-time server setup:
 
-1. Install Git, Node.js 22.12+, PM2, and pnpm 10.26.2 or Corepack for the `dev` user. The script loads NVM when present.
+1. Install Git, Node.js 22.12+, PM2, and pnpm 10.26.2 or Corepack for the `dev` user. The script keeps a compatible Node already on `PATH`; otherwise it selects a compatible installed NVM version without changing the user's default alias. It prints the remote hostname, Node version, and executable path before deploying.
 2. Verify the server's Git SSH access and the server host fingerprint through your normal SSH setup.
 3. Create `/home/dev/MMB/.env` with the five Discord/R2 variables listed above. It may be provisioned before the initial checkout. The deploy script preserves it and sets its permissions to `600`.
 4. Stop the local copy of this bot before activating the server copy; run only one bot instance.

@@ -68,7 +68,15 @@ fi
       pm2: '#!/usr/bin/env bash\nprintf "pm2 %s\\n" "$*" >> "$MMB_TEST_LOG"\n',
     };
     for (const [name, content] of Object.entries(scripts)) await writeFile(path.join(bin, name), content, { mode: 0o755 });
-    const env = { ...process.env, PATH: `${bin}:${process.env.PATH}`, GIT_SSH_COMMAND: path.join(bin, 'fake-ssh'), GIT_SSH_VARIANT: 'ssh', MMB_TEST_BARE: bare, MMB_TEST_LOG: log };
+    const nvmDirectory = path.join(temporary, 'nvm');
+    const oldBin = path.join(temporary, 'old-node');
+    const newBin = path.join(nvmDirectory, 'versions/node/v24.21.0/bin');
+    const nvmSelection = path.join(temporary, 'nvm-selection');
+    await mkdir(oldBin); await mkdir(newBin, { recursive: true });
+    await writeFile(path.join(oldBin, 'node'), '#!/usr/bin/env bash\nif [[ "$1" = -e ]]; then exit 1; fi\nif [[ "$1" = --version ]]; then echo v20.18.0; exit; fi\nexec "$MMB_TEST_REAL_NODE" "$@"\n', { mode: 0o755 });
+    await writeFile(path.join(newBin, 'node'), '#!/usr/bin/env bash\nexec "$MMB_TEST_REAL_NODE" "$@"\n', { mode: 0o755 });
+    await writeFile(path.join(nvmDirectory, 'nvm.sh'), 'nvm() { export PATH="$NVM_DIR/versions/node/$3/bin:$PATH"; printf "%s" "$3" > "$MMB_TEST_NVM_SELECTION"; }\nif [[ "$1" != --no-use ]]; then export PATH="$MMB_TEST_OLD_BIN:$PATH"; fi\n');
+    const env = { ...process.env, PATH: `${bin}:${process.env.PATH}`, GIT_SSH_COMMAND: path.join(bin, 'fake-ssh'), GIT_SSH_VARIANT: 'ssh', MMB_TEST_BARE: bare, MMB_TEST_LOG: log, NVM_DIR: nvmDirectory, MMB_TEST_NVM_SELECTION: nvmSelection, MMB_TEST_REAL_NODE: process.execPath, MMB_TEST_OLD_BIN: oldBin };
     const repo = 'git@example.invalid:test/MMB.git';
     const deploy = extra => spawnSync('bash', [serverScript, repo, 'main', target], { encoding: 'utf8', env: { ...env, ...extra }, timeout: 20000 });
     let result = deploy();
@@ -80,6 +88,8 @@ fi
     assert.match(commands, /pm2 startOrRestart .*ecosystem\.config\.cjs --only mmb-discord-bot --update-env/);
     assert.match(commands, /pm2 save/);
     assert.doesNotMatch(commands, /website|admin-dashboard|test-only-secret/);
+    assert.match(result.stdout, /Remote runtime on .*: v(?:2[2-9]|[3-9][0-9])\./, 'A compatible PATH runtime must not be downgraded by NVM.');
+    assert.equal(await readFile(nvmSelection, 'utf8').catch(() => null), null, 'Compatible Node must not load the older NVM default.');
     await writeFile(path.join(source, 'version.txt'), 'second\n');
     run('git', ['add', '.'], { cwd: source });
     run('git', ['commit', '--quiet', '-m', 'Second test release'], { cwd: source });
@@ -87,6 +97,9 @@ fi
     result = deploy(); assert.equal(result.status, 0, result.stderr || result.stdout);
     assert.equal(await readFile(path.join(target, 'version.txt'), 'utf8'), 'second\n');
     assert.equal(await readFile(path.join(target, '.env'), 'utf8'), 'DISCORD_BOT_TOKEN=test-only-secret\n');
+    result = deploy({ PATH: `${oldBin}:${env.PATH}` });
+    assert.equal(result.status, 0, result.stderr || result.stdout);
+    assert.equal(await readFile(nvmSelection, 'utf8'), 'v24.21.0', 'An old PATH runtime must select a compatible installed NVM version.');
     commands = await readFile(log, 'utf8'); const pm2Count = commands.split('\n').filter(line => line.startsWith('pm2 ')).length;
     await writeFile(path.join(target, 'version.txt'), 'server edit\n');
     result = deploy(); assert.notEqual(result.status, 0); assert.match(result.stderr, /tracked server changes/);
