@@ -48,14 +48,15 @@ if [[ ! -d "$deploy_dir/.git" ]]; then
     fail "$deploy_dir is not an empty Git checkout (only a pre-provisioned .env is allowed)."
   fi
   mkdir -p "$deploy_dir"
-  git init --initial-branch="$deploy_branch" "$deploy_dir"
+  git init "$deploy_dir"
+  git -C "$deploy_dir" symbolic-ref HEAD "refs/heads/$deploy_branch"
   git -C "$deploy_dir" remote add origin "$repo_url"
   git -C "$deploy_dir" fetch origin "$deploy_branch"
   if git -C "$deploy_dir" cat-file -e 'FETCH_HEAD:.env' 2>/dev/null; then fail 'The remote tracks .env; refusing to overwrite server secrets.'; fi
   git -C "$deploy_dir" checkout --track -B "$deploy_branch" "origin/$deploy_branch"
 else
   [[ "$(git -C "$deploy_dir" remote get-url origin)" = "$repo_url" ]] || fail 'The server checkout has a different origin; it was preserved.'
-  [[ "$(git -C "$deploy_dir" branch --show-current)" = "$deploy_branch" ]] || fail 'The server checkout is on a different branch; it was preserved.'
+  [[ "$(git -C "$deploy_dir" symbolic-ref --quiet --short HEAD)" = "$deploy_branch" ]] || fail 'The server checkout is on a different branch; it was preserved.'
   git -C "$deploy_dir" diff --quiet && git -C "$deploy_dir" diff --cached --quiet || fail 'Commit or stash tracked server changes before deploying.'
   git -C "$deploy_dir" fetch origin "$deploy_branch"
   if git -C "$deploy_dir" cat-file -e 'FETCH_HEAD:.env' 2>/dev/null; then fail 'The remote tracks .env; refusing to overwrite server secrets.'; fi

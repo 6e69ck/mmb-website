@@ -53,6 +53,7 @@ test('server deployment preserves secrets, pulls fast-forward, and starts only t
     run('git', ['push', '--quiet', bare, 'main'], { cwd: source });
     await writeFile(path.join(target, '.env'), 'DISCORD_BOT_TOKEN=test-only-secret\n');
     const scripts = {
+      git: '#!/usr/bin/env bash\nfor arg in "$@"; do case "$arg" in --initial-branch*|--show-current) echo "Unsupported old Git option" >&2; exit 129;; esac; done\nexec "$MMB_TEST_REAL_GIT" "$@"\n',
       'fake-ssh': '#!/usr/bin/env bash\nexec git-upload-pack "$MMB_TEST_BARE"\n',
       pnpm: `#!/usr/bin/env bash
 set -e
@@ -76,7 +77,8 @@ fi
     await writeFile(path.join(oldBin, 'node'), '#!/usr/bin/env bash\nif [[ "$1" = -e ]]; then exit 1; fi\nif [[ "$1" = --version ]]; then echo v20.18.0; exit; fi\nexec "$MMB_TEST_REAL_NODE" "$@"\n', { mode: 0o755 });
     await writeFile(path.join(newBin, 'node'), '#!/usr/bin/env bash\nexec "$MMB_TEST_REAL_NODE" "$@"\n', { mode: 0o755 });
     await writeFile(path.join(nvmDirectory, 'nvm.sh'), 'nvm() { export PATH="$NVM_DIR/versions/node/$3/bin:$PATH"; printf "%s" "$3" > "$MMB_TEST_NVM_SELECTION"; }\nif [[ "$1" != --no-use ]]; then export PATH="$MMB_TEST_OLD_BIN:$PATH"; fi\n');
-    const env = { ...process.env, PATH: `${bin}:${process.env.PATH}`, GIT_SSH_COMMAND: path.join(bin, 'fake-ssh'), GIT_SSH_VARIANT: 'ssh', MMB_TEST_BARE: bare, MMB_TEST_LOG: log, NVM_DIR: nvmDirectory, MMB_TEST_NVM_SELECTION: nvmSelection, MMB_TEST_REAL_NODE: process.execPath, MMB_TEST_OLD_BIN: oldBin };
+    const realGit = run('which', ['git']);
+    const env = { ...process.env, PATH: `${bin}:${process.env.PATH}`, GIT_SSH_COMMAND: path.join(bin, 'fake-ssh'), GIT_SSH_VARIANT: 'ssh', MMB_TEST_BARE: bare, MMB_TEST_LOG: log, NVM_DIR: nvmDirectory, MMB_TEST_NVM_SELECTION: nvmSelection, MMB_TEST_REAL_NODE: process.execPath, MMB_TEST_OLD_BIN: oldBin, MMB_TEST_REAL_GIT: realGit };
     const repo = 'git@example.invalid:test/MMB.git';
     const deploy = extra => spawnSync('bash', [serverScript, repo, 'main', target], { encoding: 'utf8', env: { ...env, ...extra }, timeout: 20000 });
     let result = deploy();
