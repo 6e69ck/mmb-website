@@ -70,6 +70,7 @@ pnpm cloudflare:access  # Configure email-code Access; write ignored local audie
 pnpm deploy:website    # Build, stage R2 image routes, deploy website, connect custom domain
 pnpm deploy:admin      # Build and deploy admin; requires the configured Access settings
 pnpm deploy:pages      # Deploy both projects
+pnpm release           # Deploy website, admin dashboard, and Discord bot
 node scripts/pages-domain.mjs  # Connect domains for already-deployed projects
 ```
 

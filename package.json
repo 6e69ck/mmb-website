@@ -17,6 +17,7 @@
     "gallery:migrate": "pnpm --filter @mmb/admin-dashboard gallery:migrate",
     "images:migrate": "pnpm --filter @mmb/admin-dashboard images:migrate",
     "deploy:admin": "pnpm --filter @mmb/admin-dashboard deploy",
+    "release": "node scripts/deploy-all.mjs",
     "deploy:bot": "node scripts/deploy-bot.mjs",
     "deploy:pages": "node scripts/deploy-pages.mjs",
     "deploy:website": "node scripts/deploy-pages.mjs --website",
