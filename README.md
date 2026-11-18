@@ -31,6 +31,8 @@ pnpm dev:website         # Website only
 pnpm dev:admin           # Dashboard and API only
 pnpm dev:bot             # Discord bot only; uses the real channel and bucket
 pnpm bot:check-config    # Validate the bot environment without connecting
+pnpm deploy:bot          # Pull/build only the bot on dev@192.18.151.14 and start it in PM2
+pnpm test:deploy-bot     # Local deployment-script integration tests; no server connection
 pnpm gallery:seed-local  # Seed an uninitialized local gallery explicitly
 pnpm images:migrate     # Upload every original website image to R2
 ```
