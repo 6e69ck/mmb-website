@@ -53,7 +53,7 @@ for (const page of site.pages) {
     const node = built(img);
     if (node.attr('src') !== site.logo) {
       assert.ok(isBlurhashValid(node.attr('data-blurhash') || '').result, `${file}: missing BlurHash`);
-      assert.match(node.attr('style') || '', /--image-placeholder:.*data:image\/png;base64,/, `${file}: missing placeholder`);
+      assert.match(node.parent('.progressive-image').attr('style') || '', /--image-placeholder:.*data:image\/png;base64,/, `${file}: missing placeholder`);
     }
     assert.ok(node.attr('width') && node.attr('height'), `${file}: missing image dimensions`);
     assert.ok(node.attr('src')?.startsWith('/'), `${file}: missing native image source`);

@@ -31,10 +31,8 @@ const galleryApiBase = import.meta.env.PUBLIC_GALLERY_API_URL || (import.meta.en
     <title>{page.title}</title>
     <link rel="icon" type="image/png" href={site.logo} />
     <link rel="canonical" href={new URL(page.path, Astro.site || site.origin)} />
-    <script is:inline>
-      document.addEventListener('load', (event) => {
-        if (event.target instanceof HTMLImageElement) event.target.dataset.imageReady = 'true';
-      }, true);
+    <script>
+      import '../scripts/image-reveal';
     </script>
     {page.stylesheets.map((href: string) => <link rel="stylesheet" href={href} />)}
     {page.inlineStyles.map((css: string) => <style is:inline set:html={css} />)}

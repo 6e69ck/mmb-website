@@ -41,7 +41,8 @@ function enhance(html) {
     if (/\bwidth\s*:\s*auto\b/i.test(style)) img.attr('style', style.replace(/\bwidth\s*:\s*auto\b/i, `width:${image.width}px`));
     img.attr('width', image.width).attr('height', image.height);
     img.attr('data-blurhash', image.hash);
-    img.attr('style', [img.attr('style'), `--image-placeholder: url('${image.placeholder}')`].filter(Boolean).join('; '));
+    img.wrap('<span class="progressive-image"></span>');
+    img.parent().attr('style', `--image-placeholder: url('${image.placeholder}')`);
   });
   $('[style*="background-image"]').each((_, el) => {
     const node = $(el);

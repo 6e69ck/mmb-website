@@ -221,7 +221,9 @@ function VideoTile({ item }: { item: Video }) {
 function PhotoTile({ photo, year, index }: { photo: Photo; year: number | null; index: number }) {
   return <figure className="mosaic-tile">
     <a href={photo.src} rel={`lightbox[year-${year}]`} title={photo.caption || undefined} aria-label={photo.caption || photo.alt || `Open photo ${index + 1}${year === null ? '' : ` from ${year}`}`}>
-      <img key={photo.thumbnail} src={photo.thumbnail} data-blurhash={photo.hash} style={{ '--image-placeholder': `url("${photo.placeholder}")` } as CSSProperties} width={photo.width} height={photo.height} alt={photo.alt} loading="lazy" decoding="async" />
+      <span key={photo.thumbnail} className="progressive-image" style={{ '--image-placeholder': `url("${photo.placeholder}")` } as CSSProperties}>
+        <img src={photo.thumbnail} data-blurhash={photo.hash} width={photo.width} height={photo.height} alt={photo.alt} loading="lazy" decoding="async" />
+      </span>
     </a>
     {photo.caption && <figcaption>{photo.caption}</figcaption>}
   </figure>;

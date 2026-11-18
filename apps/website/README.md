@@ -47,7 +47,7 @@ This updates the captured content and assets to the source website's current sta
 
 ## Images and interaction
 
-Images use their real URLs and reserve their original dimensions. A BlurHash background fills the space while a photo loads and is cleared when the image is ready. Section backgrounds layer the original image over their placeholder, and the site logos load directly.
+Images use their real URLs and reserve their original dimensions. If a visible photo is still loading after a brief delay, a BlurHash covers it and fades out over 500 ms once the photo is decoded. Section backgrounds layer the original image over their placeholder, and the site logos load directly.
 
 The photo viewer supports previous/next controls, arrow keys, Escape, focus return, and native dialog focus containment. Desktop dropdowns open after 200ms hover and close after 180ms; native disclosure elements retain keyboard/touch support. Mobile navigation rows provide full-width touch targets. Media links directly to the combined gallery. Reduced-motion preferences are honored.
 

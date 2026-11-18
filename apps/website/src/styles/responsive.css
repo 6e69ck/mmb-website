@@ -47,10 +47,24 @@ summary::-webkit-details-marker { display: none; }
 .wsite-youtube-container iframe { position: absolute; inset: 0; width: 100%; height: 100%; }
 iframe { max-width: 100%; }
 .wsite-section-bg-image { background-position: center !important; }
-@media (scripting: enabled) {
-  img[data-blurhash]:not([data-image-ready]) {
-    background: var(--image-placeholder) center / 100% 100% no-repeat;
-  }
+.progressive-image { position: relative; display: inline-block; max-width: 100%; vertical-align: top; }
+.progressive-image > img { display: block; }
+.mosaic-tile .progressive-image, .join-ensemble-card-photo .progressive-image { display: block; }
+.join-ensemble-card-photo .progressive-image { height: 100%; }
+.progressive-image[data-image-waiting]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--image-placeholder) center / 100% 100% no-repeat;
+  opacity: 1;
+}
+.progressive-image[data-image-waiting][data-image-ready]::after {
+  opacity: 0;
+  transition: opacity 500ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .progressive-image[data-image-waiting][data-image-ready]::after { transition: none; }
 }
 @keyframes image-reveal { from { filter: blur(6px); } to { filter: blur(0); } }
 .imageGallery { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; height: auto !important; }
