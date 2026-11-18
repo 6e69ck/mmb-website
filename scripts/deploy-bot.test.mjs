@@ -108,5 +108,12 @@ fi
     run('git', ['restore', 'version.txt'], { cwd: target });
     result = deploy({ MMB_TEST_FAIL_BUILD: '1' }); assert.notEqual(result.status, 0);
     assert.equal((await readFile(log, 'utf8')).split('\n').filter(line => line.startsWith('pm2 ')).length, pm2Count, 'Failed checks/builds must never restart PM2.');
+    await rm(path.join(source, 'ecosystem.config.cjs'));
+    run('git', ['add', '.'], { cwd: source });
+    run('git', ['commit', '--quiet', '-m', 'Fixture without deployment config'], { cwd: source });
+    run('git', ['push', '--quiet', bare, 'main'], { cwd: source });
+    const beforeMissingConfig = await readFile(log, 'utf8');
+    result = deploy(); assert.notEqual(result.status, 0); assert.match(result.stderr, /missing ecosystem.config.cjs/);
+    assert.equal(await readFile(log, 'utf8'), beforeMissingConfig, 'Missing deployment config must fail before dependency installs and PM2 commands.');
   } finally { await rm(temporary, { recursive: true, force: true }); }
 });

@@ -64,6 +64,7 @@ else
 fi
 
 cd "$deploy_dir"
+[[ -f ecosystem.config.cjs ]] || fail 'The server checkout is missing ecosystem.config.cjs. Push the deployment commits to origin before deploying.'
 [[ -f .env ]] || fail "Create $deploy_dir/.env with the Discord and R2 configuration, then rerun this script."
 chmod 600 .env
 expected_pnpm="$(node -p 'require("./package.json").packageManager.replace(/^pnpm@/, "")')"
