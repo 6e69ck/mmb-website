@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { PAGE_METADATA, PAGE_SLUGS, isPageSlug, type PageSlug } from '@mmb/content';
 import type { GalleryItem, GalleryPhoto } from '@mmb/gallery';
 import { api, ApiError } from './api';
 import ImageViewerModal, { extractFilename, type ImageViewerItem } from './ImageViewerModal';
 import PageEditor, { prefetchPage } from './pages/PageEditor';
-import { Icon, Modal, type IconName } from './ui';
+import { Icon, Modal, Toast, type IconName, type ToastMessage } from './ui';
 import AddDialog from './UploadDialog';
 
 type Session = {
@@ -164,7 +164,13 @@ export default function App() {
   const [loading, setLoading] = useState(true), [error, setError] = useState(''), [unauthorized, setUnauthorized] = useState(false);
   const [search, setSearch] = useState(''), [year, setYear] = useState('all'), [kind, setKind] = useState('all'), [visibility, setVisibility] = useState('all');
   const [adding, setAdding] = useState(false), [editing, setEditing] = useState<GalleryItem | null>(null), [removing, setRemoving] = useState<GalleryItem | null>(null), [viewingImage, setViewingImage] = useState<ImageViewerItem | null>(null);
-  const [working, setWorking] = useState<string | null>(null), [notice, setNotice] = useState('');
+  const [working, setWorking] = useState<string | null>(null);
+  const [toast, setToast] = useState<ToastMessage | null>(null);
+  const toastIdRef = useRef(0);
+  const notify = useCallback((text: string) => {
+    setToast({ id: ++toastIdRef.current, text });
+  }, []);
+  const dismissToast = useCallback(() => setToast(null), []);
 
   useEffect(() => {
     const onPop = () => setRoute(parseRoute(window.location.pathname));
@@ -214,7 +220,7 @@ export default function App() {
   const filtered = items.filter(item => (year === 'all' || item.year === Number(year)) && (kind === 'all' || item.kind === kind) && (visibility === 'all' || item.published === (visibility === 'published')) && `${itemTitle(item)} ${item.kind === 'photo' ? item.alt : item.note}`.toLowerCase().includes(search.toLowerCase())).sort((a, b) => b.year - a.year || a.order - b.order || b.createdAt.localeCompare(a.createdAt));
   async function toggle(item: GalleryItem) {
     setWorking(item.id); setError('');
-    try { const result = await api<ItemResult>(`/api/admin/items/${item.id}`, { method: 'PATCH', body: JSON.stringify({ published: !item.published, expectedUpdatedAt: item.updatedAt }) }); update(result.item); setNotice(result.item.published ? 'Item published to the gallery.' : 'Item hidden from the public gallery.'); }
+    try { const result = await api<ItemResult>(`/api/admin/items/${item.id}`, { method: 'PATCH', body: JSON.stringify({ published: !item.published, expectedUpdatedAt: item.updatedAt }) }); update(result.item); notify(result.item.published ? 'Item published to the gallery.' : 'Item hidden from the public gallery.'); }
     catch (caught) { setError(errorMessage(caught)); }
     finally { setWorking(null); }
   }
@@ -296,7 +302,7 @@ export default function App() {
       <main className="admin-main">
         {session?.mode === 'local' && <div className="development-note">Local preview</div>}
         {route.kind === 'page' ? (
-          <PageEditor key={route.slug} slug={route.slug} mode={session?.mode || 'local'} onDirtyChange={setPageDirty} />
+          <PageEditor key={route.slug} slug={route.slug} mode={session?.mode || 'local'} onDirtyChange={setPageDirty} onNotify={notify} />
         ) : (
           <>
             <div className="page-heading"><div><h1>Gallery</h1></div><button className="button button-primary" type="button" onClick={() => setAdding(true)} disabled={loading || !session}><Icon name="plus" />Add media</button></div>
@@ -309,7 +315,6 @@ export default function App() {
               </div>
               <div className="library-toolbar"><label className="search-field"><Icon name="search" size={18} /><input aria-label="Search gallery" placeholder="Search captions and titles" value={search} onChange={event => setSearch(event.target.value)} /></label><div className="library-filters"><label className="filter-label"><span>Type</span><select aria-label="Filter by media type" value={kind} onChange={event => setKind(event.target.value)}><option value="all">All media</option><option value="photo">Photos</option><option value="video">Videos</option></select></label><label className="filter-label"><span>Visibility</span><select aria-label="Filter by visibility" value={visibility} onChange={event => setVisibility(event.target.value)}><option value="all">Any visibility</option><option value="published">Published</option><option value="hidden">Hidden</option></select></label></div></div>
               {error && <div className="form-error page-error" role="alert"><span>{error}</span><button className="text-button" type="button" onClick={() => void load()}>Retry</button></div>}
-              {notice && <div className="success-notice" role="status"><Icon name="check" size={16} />{notice}<button className="icon-button" type="button" aria-label="Dismiss notification" onClick={() => setNotice('')}><Icon name="close" size={16} /></button></div>}
               {loading && !items.length ? <div className="loading-state" role="status"><span className="loading-spinner" />Loading your gallery…</div> : filtered.length ? <><p className="results-count">{filtered.length} {filtered.length === 1 ? 'item' : 'items'}{search || year !== 'all' || kind !== 'all' || visibility !== 'all' ? ' match your filters' : ' in your library'}</p><div className="admin-media-grid">{filtered.map(item => <article className="admin-media-card" key={item.id}><button className={`card-preview-button ${item.kind === 'photo' ? 'is-photo-preview' : ''}`} type="button" onClick={() => item.kind === 'photo' ? setViewingImage(photoViewerItem(item)) : setEditing(item)} aria-label={item.kind === 'photo' ? `View full-size photo: ${itemTitle(item)}` : `Edit ${itemTitle(item)}`} title={item.kind === 'photo' ? 'Click to view full-size image' : undefined}><Preview item={item} /><span className="media-type-badge"><Icon name={item.kind === 'photo' ? 'image' : 'video'} size={12} />{item.kind === 'photo' ? 'Photo' : 'Video'}</span>{item.kind === 'photo' && <span className="preview-inspect-badge" aria-hidden="true"><Icon name="eye" size={13} /> View</span>}</button><div className="card-details"><div className="card-meta"><span>{item.year}</span><span className={`visibility-badge ${item.published ? 'published' : ''}`}>{item.published ? 'Published' : 'Hidden'}</span></div><h3 title={itemTitle(item)}>{itemTitle(item)}</h3><div className="card-actions"><button type="button" className="card-action-icon" aria-label="Edit" title="Edit" onClick={() => setEditing(item)}><Icon name="edit" size={16} /></button><button type="button" className={`card-action-icon ${!item.published ? 'is-hidden-state' : ''}`} disabled={working === item.id} aria-label={working === item.id ? 'Saving…' : item.published ? 'Hide' : 'Publish'} title={working === item.id ? 'Saving…' : item.published ? 'Hide from public gallery' : 'Publish to public gallery'} onClick={() => void toggle(item)}><Icon name={item.published ? 'eye' : 'eyeOff'} size={16} /></button><button type="button" className="card-action-icon remove-link" aria-label="Remove" title="Remove" onClick={() => setRemoving(item)}><Icon name="trash" size={16} /></button></div></div></article>)}</div></> : !error && <div className="empty-state"><span className="empty-state-icon"><Icon name="gallery" size={30} /></span><h3>{items.length ? 'No matching media' : 'A new chapter starts here'}</h3><p>{items.length ? 'Try another year, type, or search term.' : 'Add your first photos or videos to bring the gallery to life.'}</p>{items.length ? <button className="button button-secondary" type="button" onClick={() => { setSearch(''); setYear('all'); setKind('all'); setVisibility('all'); }}>Clear filters</button> : <button className="button button-primary" type="button" onClick={() => setAdding(true)} disabled={!session}>Add media</button>}</div>}
             </section>
           </>
@@ -317,9 +322,10 @@ export default function App() {
         <footer className="admin-footer">McMaster Marching Band <span>Website administration · 2026</span></footer>
       </main>
     </div>
-    {adding && <AddDialog onClose={() => { setAdding(false); void load(); }} onAdded={item => { update(item); setNotice(item.published ? 'Added to the public gallery.' : 'Saved as a hidden item.'); }} />}
-    {editing && <EditDialog item={editing} onClose={() => setEditing(null)} onSaved={item => { update(item); setNotice('Changes saved.'); }} onViewImage={setViewingImage} />}
-    {removing && <RemoveDialog item={removing} onClose={() => setRemoving(null)} onRemoved={id => { setItems(current => current.filter(item => item.id !== id)); setNotice('Item removed from the gallery.'); }} />}
+    {adding && <AddDialog onClose={() => { setAdding(false); void load(); }} onAdded={item => { update(item); notify(item.published ? 'Added to the public gallery.' : 'Saved as a hidden item.'); }} />}
+    {editing && <EditDialog item={editing} onClose={() => setEditing(null)} onSaved={item => { update(item); notify('Changes saved.'); }} onViewImage={setViewingImage} />}
+    {removing && <RemoveDialog item={removing} onClose={() => setRemoving(null)} onRemoved={id => { setItems(current => current.filter(item => item.id !== id)); notify('Item removed from the gallery.'); }} />}
     {viewingImage && <ImageViewerModal item={viewingImage} onClose={() => setViewingImage(null)} />}
+    <Toast toast={toast} onDismiss={dismissToast} />
   </div>;
 }

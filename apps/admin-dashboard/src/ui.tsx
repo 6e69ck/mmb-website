@@ -84,3 +84,32 @@ export function Modal({ title, description, children, onClose, busy = false, wid
     {children}
   </dialog>;
 }
+
+export type ToastMessage = { id: number; text: string };
+
+export function Toast({ toast, onDismiss }: { toast: ToastMessage | null; onDismiss: () => void }) {
+  useEffect(() => {
+    if (!toast) return;
+    const timer = window.setTimeout(onDismiss, 5000);
+    return () => window.clearTimeout(timer);
+  }, [toast, onDismiss]);
+
+  return (
+    <div className="toast-region" aria-live="polite" aria-atomic="true">
+      {toast && (
+        <div key={toast.id} className="toast-popup" role="status">
+          <span className="toast-icon"><Icon name="check" size={16} /></span>
+          <span className="toast-text">{toast.text}</span>
+          <button
+            className="icon-button toast-dismiss"
+            type="button"
+            aria-label="Dismiss notification"
+            onClick={onDismiss}
+          >
+            <Icon name="close" size={16} />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}

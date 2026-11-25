@@ -59,10 +59,12 @@ export default function PageEditor({
   slug,
   mode,
   onDirtyChange,
+  onNotify,
 }: {
   slug: PageSlug;
   mode: 'local' | 'production';
   onDirtyChange: (dirty: boolean) => void;
+  onNotify?: (message: string) => void;
 }) {
   const meta = PAGE_METADATA[slug];
   const initial = pageCache.get(slug);
@@ -76,7 +78,6 @@ export default function PageEditor({
   const [showSpinner, setShowSpinner] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-  const [notice, setNotice] = useState('');
   const [commitMessage, setCommitMessage] = useState('');
   const [viewMode, setViewMode] = useState<ViewMode>('edit');
   const [seoOpen, setSeoOpen] = useState(false);
@@ -176,7 +177,6 @@ export default function PageEditor({
     if (!serverPage) return;
     setSaving(true);
     setError('');
-    setNotice('');
     try {
       const res = await api<{ page: PageDocument; driveCaches: Record<string, DriveFolderCache> }>(`/api/admin/pages/${slug}`, {
         method: 'PUT',
@@ -203,7 +203,7 @@ export default function PageEditor({
       setDriveCaches(nextDriveCaches);
       setCommitMessage('');
       onDirtyChange(false);
-      setNotice(`Published revision ${res.page.revision} to the live website.`);
+      onNotify?.(`Published revision ${res.page.revision} to the live website.`);
     } catch (caught) {
       if (caught instanceof ApiError && caught.status === 409) {
         setError('Another administrator published changes while you were editing. Refresh the page to load the latest version before publishing.');
@@ -303,15 +303,6 @@ export default function PageEditor({
         <div className="form-error page-error" role="alert">
           <span>{error}</span>
           <button className="text-button" type="button" onClick={() => void loadPage({ force: true })}>Reload latest</button>
-        </div>
-      )}
-      {notice && (
-        <div className="success-notice" role="status">
-          <Icon name="check" size={16} />
-          {notice}
-          <button className="icon-button" type="button" aria-label="Dismiss notification" onClick={() => setNotice('')}>
-            <Icon name="close" size={16} />
-          </button>
         </div>
       )}
 
@@ -438,7 +429,7 @@ export default function PageEditor({
             setSeo(restored.seo);
             setBlocks(restored.blocks);
             onDirtyChange(false);
-            setNotice(`Restored ${meta.label} (now revision ${restored.revision}).`);
+            onNotify?.(`Restored ${meta.label} (now revision ${restored.revision}).`);
           }}
         />
       )}

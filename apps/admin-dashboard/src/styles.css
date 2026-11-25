@@ -137,10 +137,13 @@ svg { flex-shrink: 0; }
 .card-actions .remove-link { margin-left: auto; color: #7f3030; }
 .card-actions .remove-link:hover:not(:disabled) { background: #fdf2f3; color: #a12634; }
 
-.success-notice, .form-error { padding: 13px 15px; font-size: 13px; line-height: 1.65; overflow-wrap: anywhere; }
-.success-notice { display: flex; align-items: center; gap: 10px; margin: 16px 0; border: 1px solid #bed4c4; border-left: 3px solid #387448; background: #f0f7f2; color: #2d5e3b; }
-.success-notice .icon-button { margin-left: auto; }
-.form-error { border: 1px solid #dcbfc3; border-left: 3px solid #a12634; background: #fff5f5; color: #8b2030; }
+.form-error { padding: 13px 15px; font-size: 13px; line-height: 1.65; overflow-wrap: anywhere; border: 1px solid #dcbfc3; border-left: 3px solid #a12634; background: #fff5f5; color: #8b2030; }
+.toast-region { position: fixed; top: 18px; right: 18px; z-index: 1000; width: min(380px, calc(100vw - 36px)); pointer-events: none; }
+.toast-popup { pointer-events: auto; display: flex; align-items: center; gap: 10px; padding: 12px 10px 12px 14px; border: 1px solid #bed4c4; border-left: 4px solid #387448; background: #fff; color: #244a30; font-size: 13px; font-weight: 500; line-height: 1.45; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14); animation: toast-in 180ms ease-out; }
+.toast-icon { display: inline-grid; place-items: center; flex-shrink: 0; color: #387448; }
+.toast-text { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.toast-dismiss { width: 34px; height: 34px; color: #4d6b56; }
+@keyframes toast-in { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
 .page-error { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin: 16px 0; }
 .empty-state, .loading-state { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 320px; padding: 40px 24px; text-align: center; }
 .empty-state-icon { display: inline-grid; place-items: center; width: 64px; height: 64px; color: var(--maroon); border: 1px solid var(--line); background: #fff; }
@@ -260,6 +263,7 @@ svg { flex-shrink: 0; }
   .card-actions button { font-size: 12px; }
   .admin-footer { display: block; line-height: 1.8; }
   .admin-footer span { display: block; }
+  .toast-region { top: 12px; left: 12px; right: 12px; width: auto; }
   .topbar-actions { gap: 10px; }
   .mobile-wordmark { gap: 8px; font-size: 11px; }
   .mobile-wordmark > span:last-child { max-width: 90px; }
