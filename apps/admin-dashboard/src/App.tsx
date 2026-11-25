@@ -3,7 +3,7 @@ import { PAGE_METADATA, PAGE_SLUGS, isPageSlug, type PageSlug } from '@mmb/conte
 import type { GalleryItem, GalleryPhoto } from '@mmb/gallery';
 import { api, ApiError } from './api';
 import ImageViewerModal, { extractFilename, type ImageViewerItem } from './ImageViewerModal';
-import PageEditor from './pages/PageEditor';
+import PageEditor, { prefetchPage } from './pages/PageEditor';
 import { Icon, Modal, type IconName } from './ui';
 import AddDialog from './UploadDialog';
 
@@ -51,13 +51,47 @@ function photoViewerItem(item: GalleryPhoto): ImageViewerItem {
   };
 }
 
+const loadedPreviewUrls = new Set<string>();
+
 function Preview({ item, large = false }: { item: GalleryItem; large?: boolean }) {
-  const [ready, setReady] = useState(false);
   const image = item.kind === 'photo' ? item.thumbnail : item.poster;
   const placeholder = item.placeholder;
   const local = image ? resolveGalleryMediaUrl(image) : undefined;
+  const cached = Boolean(local && loadedPreviewUrls.has(local));
+  const [ready, setReady] = useState(cached);
+  const [instant, setInstant] = useState(cached);
+
+  useEffect(() => {
+    const isCached = Boolean(local && loadedPreviewUrls.has(local));
+    setReady(isCached);
+    setInstant(isCached);
+  }, [local]);
+
   return <div className={`media-preview ${large ? 'preview-large' : ''}`} style={placeholder ? { backgroundImage: `url("${placeholder}")` } : undefined}>
-    {local ? <img key={local} src={local} alt={item.kind === 'photo' ? item.alt : item.title} loading="lazy" onLoad={() => setReady(true)} className={ready ? 'is-ready' : ''} /> : <div className="video-placeholder"><Icon name="video" size={40} /><span>{item.kind === 'video' && item.provider === 'youtube' ? 'YouTube video' : 'Video'}</span></div>}
+    {local ? (
+      <img
+        key={local}
+        ref={img => {
+          if (img && img.complete && img.naturalWidth > 0) {
+            loadedPreviewUrls.add(local);
+            if (!ready) {
+              setInstant(true);
+              setReady(true);
+            }
+          }
+        }}
+        src={local}
+        alt={item.kind === 'photo' ? item.alt : item.title}
+        loading="lazy"
+        onLoad={() => {
+          loadedPreviewUrls.add(local);
+          setReady(true);
+        }}
+        className={ready ? (instant ? 'is-ready is-instant' : 'is-ready') : ''}
+      />
+    ) : (
+      <div className="video-placeholder"><Icon name="video" size={40} /><span>{item.kind === 'video' && item.provider === 'youtube' ? 'YouTube video' : 'Video'}</span></div>
+    )}
     {item.kind === 'video' && <span className="preview-play" aria-hidden="true">▶</span>}
   </div>;
 }
@@ -153,6 +187,7 @@ export default function App() {
     if (pageDirty && !window.confirm('You have unpublished changes on this page. Discard them and switch views?')) return;
     const targetPath = next.kind === 'gallery' ? '/' : `/pages/${next.slug}`;
     window.history.pushState(null, '', targetPath);
+    window.scrollTo({ top: 0, behavior: 'instant' });
     setPageDirty(false);
     setRoute(next);
   };
@@ -216,6 +251,8 @@ export default function App() {
               className={`sidebar-link ${active ? 'active' : ''}`}
               href={`/pages/${slug}`}
               aria-current={active ? 'page' : undefined}
+              onMouseEnter={() => prefetchPage(slug)}
+              onFocus={() => prefetchPage(slug)}
               onClick={e => { e.preventDefault(); navigate({ kind: 'page', slug }); }}
             >
               <Icon name={PAGE_ICONS[slug]} />{PAGE_METADATA[slug].label}
@@ -259,7 +296,7 @@ export default function App() {
       <main className="admin-main">
         {session?.mode === 'local' && <div className="development-note">Local preview</div>}
         {route.kind === 'page' ? (
-          <PageEditor slug={route.slug} mode={session?.mode || 'local'} onDirtyChange={setPageDirty} />
+          <PageEditor key={route.slug} slug={route.slug} mode={session?.mode || 'local'} onDirtyChange={setPageDirty} />
         ) : (
           <>
             <div className="page-heading"><div><h1>Gallery</h1></div><button className="button button-primary" type="button" onClick={() => setAdding(true)} disabled={loading || !session}><Icon name="plus" />Add media</button></div>

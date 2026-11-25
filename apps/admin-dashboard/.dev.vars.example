@@ -1,16 +1,39 @@
-# Production requires Cloudflare Access, not a shared password.
-# Add these through `wrangler secret put` for the production Worker:
+# Runtime secrets for the Admin Dashboard Worker & Website Pages Functions.
+#
+# Local development:
+#   None required to run `pnpm dev` (local R2 + `DEV_AUTH=true` in wrangler.jsonc are automatic).
+#   To test GitHub history or Google Drive sync locally:
+#     cp apps/admin-dashboard/.dev.vars.example apps/admin-dashboard/.dev.vars
+#
+# Production (Cloudflare Pages):
+#   Add these with `wrangler pages secret put <NAME> --project-name mmb-admin-dashboard`.
+#   Note: If using Google Drive sync, also set GOOGLE_DRIVE_API_KEY on `mmb-website`.
+
+# ---------------------------------------------------------------------------
+# 1. Cloudflare Access (Required in production; ignored while DEV_AUTH=true)
+# ---------------------------------------------------------------------------
 ACCESS_TEAM_DOMAIN=https://YOUR-TEAM.cloudflareaccess.com
 ACCESS_AUD=YOUR-ACCESS-APPLICATION-AUDIENCE
 
-# Separate GitHub repository for page version history (optional locally, falls back to R2 history):
+# ---------------------------------------------------------------------------
+# 2. GitHub content version history (Optional — falls back to R2 snapshots)
+# Stores published JSON snapshots in a separate repo under pages/<slug>.json.
+# Choose Option A (PAT) or Option B (GitHub App).
+# ---------------------------------------------------------------------------
 # CONTENT_GITHUB_REPO=owner/mmb-website-content
 # CONTENT_GITHUB_BRANCH=main
+
+# Option A — Personal Access Token (contents: read/write on CONTENT_GITHUB_REPO):
 # CONTENT_GITHUB_TOKEN=github_pat_...
-# Or GitHub App authentication (auto-rotates installation tokens):
+
+# Option B — GitHub App (auto-rotates short-lived installation tokens):
 # CONTENT_GITHUB_APP_ID=123456
 # CONTENT_GITHUB_INSTALLATION_ID=789012
 # CONTENT_GITHUB_APP_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
 
-# Google Drive API v3 read-only key for Executive Meeting Minutes auto-sync:
+# ---------------------------------------------------------------------------
+# 3. Google Drive API v3 (Optional — Executive Meeting Minutes auto-sync)
+# Public read-only API key for folders shared as "Anyone with the link can view".
+# Set on both `mmb-admin-dashboard` (manual sync) and `mmb-website` (edge refresh).
+# ---------------------------------------------------------------------------
 # GOOGLE_DRIVE_API_KEY=AIza...

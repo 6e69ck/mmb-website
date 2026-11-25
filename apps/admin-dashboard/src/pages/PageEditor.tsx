@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   PAGE_METADATA,
   renderPageHtml,
@@ -29,6 +29,32 @@ type PageLoadResult = {
 
 type ViewMode = 'edit' | 'rearrange' | 'split' | 'preview';
 
+const pageCache = new Map<PageSlug, PageLoadResult>();
+const inflightPrefetches = new Map<PageSlug, Promise<PageLoadResult | null>>();
+
+function serializePageSnapshot(page: PageDocument, driveCaches: Record<string, DriveFolderCache>): string {
+  return JSON.stringify({ page, driveCaches });
+}
+
+export function clearPageCache(): void {
+  pageCache.clear();
+  inflightPrefetches.clear();
+}
+
+export function prefetchPage(slug: PageSlug): void {
+  if (pageCache.has(slug) || inflightPrefetches.has(slug)) return;
+  const promise = api<PageLoadResult>(`/api/admin/pages/${slug}`)
+    .then(res => {
+      pageCache.set(slug, res);
+      return res;
+    })
+    .catch(() => null)
+    .finally(() => {
+      inflightPrefetches.delete(slug);
+    });
+  inflightPrefetches.set(slug, promise);
+}
+
 export default function PageEditor({
   slug,
   mode,
@@ -39,13 +65,15 @@ export default function PageEditor({
   onDirtyChange: (dirty: boolean) => void;
 }) {
   const meta = PAGE_METADATA[slug];
-  const [serverPage, setServerPage] = useState<PageDocument | null>(null);
-  const [seo, setSeo] = useState<PageSeo>({ title: meta.defaultTitle, description: meta.defaultDescription });
-  const [blocks, setBlocks] = useState<PageBlock[]>([]);
-  const [driveCaches, setDriveCaches] = useState<Record<string, DriveFolderCache>>({});
-  const [historyProvider, setHistoryProvider] = useState<'github' | 'r2'>('r2');
-  const [driveConfigured, setDriveConfigured] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const initial = pageCache.get(slug);
+  const [serverPage, setServerPage] = useState<PageDocument | null>(() => initial?.page ?? null);
+  const [seo, setSeo] = useState<PageSeo>(() => initial?.page.seo ?? { title: meta.defaultTitle, description: meta.defaultDescription });
+  const [blocks, setBlocks] = useState<PageBlock[]>(() => initial?.page.blocks ?? []);
+  const [driveCaches, setDriveCaches] = useState<Record<string, DriveFolderCache>>(() => initial?.driveCaches ?? {});
+  const [historyProvider, setHistoryProvider] = useState<'github' | 'r2'>(() => initial?.historyProvider ?? 'r2');
+  const [driveConfigured, setDriveConfigured] = useState(() => initial?.driveConfigured ?? false);
+  const [loading, setLoading] = useState(() => !initial);
+  const [showSpinner, setShowSpinner] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -54,34 +82,91 @@ export default function PageEditor({
   const [seoOpen, setSeoOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
 
-  const loadPage = useCallback(async () => {
-    setLoading(true);
-    setError('');
-    try {
-      const res = await api<PageLoadResult>(`/api/admin/pages/${slug}`);
-      setServerPage(res.page);
-      setSeo(res.page.seo);
-      setBlocks(res.page.blocks);
-      setDriveCaches(res.driveCaches || {});
-      setHistoryProvider(res.historyProvider);
-      setDriveConfigured(res.driveConfigured);
-      setCommitMessage('');
-      onDirtyChange(false);
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Could not load page.');
-    } finally {
-      setLoading(false);
-    }
-  }, [slug, onDirtyChange]);
-
-  useEffect(() => {
-    void loadPage();
-  }, [loadPage]);
+  const serverSnapshotRef = useRef<string>(
+    initial ? serializePageSnapshot(initial.page, initial.driveCaches ?? {}) : ''
+  );
 
   const isDirty = useMemo(() => {
     if (!serverPage) return false;
     return JSON.stringify({ seo, blocks }) !== JSON.stringify({ seo: serverPage.seo, blocks: serverPage.blocks });
   }, [serverPage, seo, blocks]);
+
+  const isDirtyRef = useRef(isDirty);
+  isDirtyRef.current = isDirty;
+
+  useEffect(() => {
+    if (!loading) {
+      setShowSpinner(false);
+      return;
+    }
+    const timer = window.setTimeout(() => setShowSpinner(true), 150);
+    return () => window.clearTimeout(timer);
+  }, [loading]);
+
+  const loadPage = useCallback(
+    async (options?: { signal?: AbortSignal; silent?: boolean; force?: boolean }) => {
+      const silent = Boolean(options?.silent);
+      if (!silent) {
+        setLoading(true);
+        setError('');
+      }
+      try {
+        let res: PageLoadResult | null = null;
+        if (!options?.force) {
+          const pending = inflightPrefetches.get(slug);
+          if (pending) res = await pending;
+        }
+        if (options?.signal?.aborted) return;
+        if (!res) {
+          res = await api<PageLoadResult>(`/api/admin/pages/${slug}`, { signal: options?.signal });
+        }
+        if (options?.signal?.aborted) return;
+
+        const nextDriveCaches = res.driveCaches || {};
+        pageCache.set(slug, { ...res, driveCaches: nextDriveCaches });
+        setHistoryProvider(res.historyProvider);
+        setDriveConfigured(res.driveConfigured);
+
+        const nextSnapshot = serializePageSnapshot(res.page, nextDriveCaches);
+        if (silent) {
+          if (!isDirtyRef.current && nextSnapshot !== serverSnapshotRef.current) {
+            serverSnapshotRef.current = nextSnapshot;
+            setServerPage(res.page);
+            setSeo(res.page.seo);
+            setBlocks(res.page.blocks);
+            setDriveCaches(nextDriveCaches);
+          }
+          return;
+        }
+
+        serverSnapshotRef.current = nextSnapshot;
+        setServerPage(res.page);
+        setSeo(res.page.seo);
+        setBlocks(res.page.blocks);
+        setDriveCaches(nextDriveCaches);
+        setCommitMessage('');
+        onDirtyChange(false);
+      } catch (caught) {
+        if (options?.signal?.aborted || (caught instanceof DOMException && caught.name === 'AbortError')) {
+          return;
+        }
+        if (!silent) {
+          setError(caught instanceof Error ? caught.message : 'Could not load page.');
+        }
+      } finally {
+        if (!silent && !options?.signal?.aborted) {
+          setLoading(false);
+        }
+      }
+    },
+    [slug, onDirtyChange]
+  );
+
+  useEffect(() => {
+    const controller = new AbortController();
+    void loadPage({ signal: controller.signal, silent: Boolean(pageCache.get(slug)) });
+    return () => controller.abort();
+  }, [slug, loadPage]);
 
   useEffect(() => {
     onDirtyChange(isDirty);
@@ -103,10 +188,19 @@ export default function PageEditor({
           ...(serverPage.gitSha ? { expectedGitSha: serverPage.gitSha } : {}),
         }),
       });
+      const nextDriveCaches = res.driveCaches || {};
+      serverSnapshotRef.current = serializePageSnapshot(res.page, nextDriveCaches);
+      pageCache.set(slug, {
+        page: res.page,
+        seeded: true,
+        driveCaches: nextDriveCaches,
+        historyProvider,
+        driveConfigured,
+      });
       setServerPage(res.page);
       setSeo(res.page.seo);
       setBlocks(res.page.blocks);
-      setDriveCaches(res.driveCaches || {});
+      setDriveCaches(nextDriveCaches);
       setCommitMessage('');
       onDirtyChange(false);
       setNotice(`Published revision ${res.page.revision} to the live website.`);
@@ -208,7 +302,7 @@ export default function PageEditor({
       {error && (
         <div className="form-error page-error" role="alert">
           <span>{error}</span>
-          <button className="text-button" type="button" onClick={() => void loadPage()}>Reload latest</button>
+          <button className="text-button" type="button" onClick={() => void loadPage({ force: true })}>Reload latest</button>
         </div>
       )}
       {notice && (
@@ -222,10 +316,14 @@ export default function PageEditor({
       )}
 
       {loading ? (
-        <div className="loading-state" role="status">
-          <span className="loading-spinner" />
-          Loading {meta.label}…
-        </div>
+        showSpinner ? (
+          <div className="loading-state" role="status">
+            <span className="loading-spinner" />
+            Loading {meta.label}…
+          </div>
+        ) : (
+          <div className="page-editor-pending" aria-busy="true" />
+        )
       ) : (
         <>
           <div className="editor-toolbar-bar">
@@ -287,7 +385,17 @@ export default function PageEditor({
                     onChange={setBlocks}
                     rearrangeMode={viewMode === 'rearrange'}
                     driveCaches={driveCaches}
-                    onDriveCacheUpdated={cache => setDriveCaches(prev => ({ ...prev, [cache.folderId]: cache }))}
+                    onDriveCacheUpdated={cache => {
+                      setDriveCaches(prev => {
+                        const nextCaches = { ...prev, [cache.folderId]: cache };
+                        const cached = pageCache.get(slug);
+                        if (cached) {
+                          pageCache.set(slug, { ...cached, driveCaches: nextCaches });
+                          serverSnapshotRef.current = serializePageSnapshot(cached.page, nextCaches);
+                        }
+                        return nextCaches;
+                      });
+                    }}
                     driveConfigured={driveConfigured}
                   />
                 )}
@@ -318,6 +426,14 @@ export default function PageEditor({
           currentGitSha={serverPage.gitSha}
           onClose={() => setHistoryOpen(false)}
           onRestored={restored => {
+            serverSnapshotRef.current = serializePageSnapshot(restored, driveCaches);
+            pageCache.set(slug, {
+              page: restored,
+              seeded: true,
+              driveCaches,
+              historyProvider,
+              driveConfigured,
+            });
             setServerPage(restored);
             setSeo(restored.seo);
             setBlocks(restored.blocks);
