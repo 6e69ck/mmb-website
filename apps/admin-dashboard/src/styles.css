@@ -130,11 +130,12 @@ svg { flex-shrink: 0; }
 .visibility-badge { padding: 4px 6px; border: 1px solid #d8d8d8; background: #f3f3f3; color: #575757; font-size: 10px; font-weight: 600; line-height: 1.2; }
 .visibility-badge.published { border-color: #c3d6c9; background: #f0f6f2; color: #305e40; }
 .card-details h3 { display: -webkit-box; height: 39px; margin: 12px 0 9px; overflow: hidden; -webkit-line-clamp: 2; -webkit-box-orient: vertical; color: #333; font-size: 13px; font-weight: 600; line-height: 1.5; }
-.card-actions { display: flex; align-items: center; gap: 8px; border-top: 1px solid #e2e2e2; }
-.card-actions button { min-height: 44px; padding: 10px 3px; border: 0; background: transparent; color: var(--maroon); font-size: 12px; font-weight: 600; }
-.card-actions button:first-child { padding-left: 0; }
-.card-actions button:hover:not(:disabled) { text-decoration: underline; text-underline-offset: 4px; }
+.card-actions { display: flex; align-items: center; gap: 4px; padding: 4px 0; border-top: 1px solid #e2e2e2; }
+.card-actions .card-action-icon { display: inline-grid; place-items: center; width: 38px; height: 38px; padding: 0; border: 0; background: transparent; color: #555; transition: background-color 140ms, color 140ms; }
+.card-actions .card-action-icon:hover:not(:disabled) { background: var(--subtle); color: var(--maroon); }
+.card-actions .card-action-icon.is-hidden-state { color: #8a8a8a; }
 .card-actions .remove-link { margin-left: auto; color: #7f3030; }
+.card-actions .remove-link:hover:not(:disabled) { background: #fdf2f3; color: #a12634; }
 
 .success-notice, .form-error { padding: 13px 15px; font-size: 13px; line-height: 1.65; overflow-wrap: anywhere; }
 .success-notice { display: flex; align-items: center; gap: 10px; margin: 16px 0; border: 1px solid #bed4c4; border-left: 3px solid #387448; background: #f0f7f2; color: #2d5e3b; }
