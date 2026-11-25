@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type DragEvent, type FormEvent } from 'react';
 import { youtubeEmbed, type GalleryItem } from '@mmb/gallery';
 import { api, ApiError, uploadFile } from './api';
+import ImageViewerModal, { inferImageFormat, type ImageViewerItem } from './ImageViewerModal';
 import { processPhoto, processVideo, type ProcessedMedia } from './media-processing';
 import { fileKey, mediaKind, mergeFiles } from './upload-selection';
 import { Icon, Modal } from './ui';
@@ -30,6 +31,7 @@ export default function UploadDialog({ onClose, onAdded }: { onClose: () => void
   const [error, setError] = useState('');
   const [statuses, setStatuses] = useState<Record<string, Status>>({});
   const [previews, setPreviews] = useState<Record<string, string>>({});
+  const [viewerItem, setViewerItem] = useState<ImageViewerItem | null>(null);
   const stages = useRef(new Map<string, Stage>());
   const controller = useRef<AbortController | null>(null);
   const active = useRef(false);
@@ -40,6 +42,7 @@ export default function UploadDialog({ onClose, onAdded }: { onClose: () => void
   useEffect(() => {
     const urls = Object.fromEntries(files.filter(file => mediaKind(file) === 'photo').map(file => [fileKey(file), URL.createObjectURL(file)]));
     setPreviews(urls);
+    setViewerItem(null);
     return () => Object.values(urls).forEach(URL.revokeObjectURL);
   }, [files]);
   useEffect(() => () => {
@@ -188,7 +191,7 @@ export default function UploadDialog({ onClose, onAdded }: { onClose: () => void
         {files.length > 0 && <>
           <div className="batch-summary"><strong>{files.length} / 100 files</strong><span>{photos} {photos === 1 ? 'photo' : 'photos'} · {videos} {videos === 1 ? 'video' : 'videos'}{complete > 0 ? ` · ${complete} added` : ''}</span></div>
           <ul className="selected-files" aria-label="Selected uploads">{files.map(file => { const key = fileKey(file), result = statuses[key]; return <li key={key}>
-            <div className="selected-file-preview">{mediaKind(file) === 'photo' ? <img src={previews[key]} alt="" loading="lazy" decoding="async" /> : <Icon name="video" />}</div>
+            <div className="selected-file-preview">{mediaKind(file) === 'photo' && previews[key] ? <button type="button" className="image-preview-trigger" aria-label={`View ${file.name}`} title="Click to view full image" onClick={() => setViewerItem({ src: previews[key], alt: file.name, filename: file.name, sizeBytes: file.size, format: inferImageFormat(file.name, file.type) || undefined })}><img src={previews[key]} alt="" loading="lazy" decoding="async" /></button> : mediaKind(file) === 'photo' ? <Icon name="image" /> : <Icon name="video" />}</div>
             <span><strong>{file.name}</strong><small>{(file.size / 1024 / 1024).toFixed(1)} MB</small>{result && <span className={`file-status ${result.state}`} title={result.label}>{result.state === 'uploading' ? `${result.label} · ${Math.round(result.percent)}%` : result.label}</span>}</span>
             {result?.state === 'complete' ? <Icon name="check" size={18} /> : <button className="icon-button" type="button" aria-label={`Remove ${file.name} from selection`} disabled={busy} onClick={() => void remove(file)}><Icon name="close" size={16} /></button>}
           </li>; })}</ul>
@@ -201,5 +204,6 @@ export default function UploadDialog({ onClose, onAdded }: { onClose: () => void
       {error && <div className="form-error" role="alert">{error}</div>}
       <div className="modal-actions">{busy ? <button type="button" className="button button-secondary" onClick={() => controller.current?.abort()}>Cancel upload</button> : <button type="button" className="button button-secondary" onClick={() => void close()}>Cancel</button>}<button className="button button-primary" disabled={busy || (mode === 'media' && !remaining)}>{busy ? 'Adding…' : complete > 0 || Object.keys(statuses).length ? 'Retry remaining files' : published ? 'Add to gallery' : 'Save hidden item'}</button></div>
     </form>
+    {viewerItem && <ImageViewerModal item={viewerItem} onClose={() => setViewerItem(null)} />}
   </Modal>;
 }

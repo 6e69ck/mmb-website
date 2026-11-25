@@ -327,13 +327,21 @@
   cursor: grabbing;
 }
 
-.team-person-info-toggle {
+.team-person-edit-lead {
   display: flex;
   flex: 1;
   align-items: center;
   gap: 12px;
   min-width: 0;
   padding: 2px 4px;
+}
+
+.team-person-info-toggle {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-width: 0;
+  padding: 0;
   border: 0;
   background: transparent;
   text-align: left;
@@ -490,7 +498,7 @@
   place-items: center;
 }
 
-.team-portrait-preview a {
+.team-portrait-preview .image-preview-trigger {
   display: block;
   width: 100%;
   height: 100%;

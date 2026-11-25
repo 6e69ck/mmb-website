@@ -10,6 +10,7 @@ import {
   type TeamMember,
 } from '@mmb/content';
 import { api, uploadContentAsset } from '../api';
+import ImageViewerModal, { extractFilename, type ImageViewerItem } from '../ImageViewerModal';
 import { processPhoto } from '../media-processing';
 import { Icon } from '../ui';
 import { resolveDocumentUrl, resolveImageUrl, type AdminMode } from './asset-urls';
@@ -47,7 +48,17 @@ function ImageUploader({
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [viewing, setViewing] = useState(false);
   const src = resolveImageUrl(image, mode);
+  const viewerItem: ImageViewerItem | null = src
+    ? {
+        src,
+        alt: image?.alt || 'Preview',
+        filename: extractFilename(image?.assetKey || image?.legacyPath || src) || undefined,
+        width: image?.width,
+        height: image?.height,
+      }
+    : null;
 
   async function handleFile(file: File) {
     setBusy(true);
@@ -75,9 +86,15 @@ function ImageUploader({
     <div className="asset-uploader">
       <div className="asset-uploader-preview">
         {src ? (
-          <a href={src} target="_blank" rel="noopener noreferrer" title="Open full image">
+          <button
+            type="button"
+            className="image-preview-trigger"
+            onClick={() => setViewing(true)}
+            aria-label={`View full image${image?.alt ? `: ${image.alt}` : ''}`}
+            title="Click to view full image"
+          >
             <img src={src} alt={image?.alt || 'Preview'} />
-          </a>
+          </button>
         ) : (
           <div className="asset-placeholder">
             <Icon name="image" size={24} />
@@ -101,9 +118,9 @@ function ImageUploader({
           />
         </label>
         {src && (
-          <a className="text-button" href={src} target="_blank" rel="noopener noreferrer">
-            <Icon name="arrow" size={13} /> View full image
-          </a>
+          <button type="button" className="text-button" onClick={() => setViewing(true)}>
+            <Icon name="eye" size={14} /> View full image
+          </button>
         )}
         {allowClear && src && (
           <button type="button" className="text-button" onClick={() => onChange(undefined)} disabled={busy}>
@@ -112,6 +129,7 @@ function ImageUploader({
         )}
         {error && <span className="inline-error">{error}</span>}
       </div>
+      {viewing && viewerItem && <ImageViewerModal item={viewerItem} onClose={() => setViewing(false)} />}
     </div>
   );
 }

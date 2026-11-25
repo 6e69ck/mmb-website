@@ -8,6 +8,7 @@ import {
   type TeamMember,
 } from '@mmb/content';
 import { uploadContentAsset } from '../api';
+import ImageViewerModal, { extractFilename, type ImageViewerItem } from '../ImageViewerModal';
 import { processPhoto } from '../media-processing';
 import { Icon } from '../ui';
 import { resolveImageUrl, type AdminMode } from './asset-urls';
@@ -129,20 +130,40 @@ function SilhouetteIcon({ size = 22 }: { size?: number }) {
   );
 }
 
+function buildPortraitViewerItem(
+  src: string,
+  photo: ContentImage | undefined,
+  fallbackAlt: string
+): ImageViewerItem {
+  return {
+    src,
+    alt: photo?.alt || fallbackAlt,
+    filename: extractFilename(photo?.assetKey || photo?.legacyPath || src) || undefined,
+    width: photo?.width,
+    height: photo?.height,
+  };
+}
+
 function MemberPortraitUploader({
   photo,
   memberName,
   mode,
   onChange,
+  onViewImage,
 }: {
   photo?: ContentImage;
   memberName: string;
   mode: AdminMode;
   onChange: (next?: ContentImage) => void;
+  onViewImage: (item: ImageViewerItem) => void;
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const src = resolveImageUrl(photo, mode);
+  const openViewer = () => {
+    if (!src) return;
+    onViewImage(buildPortraitViewerItem(src, photo, memberName.trim() || 'Member portrait'));
+  };
 
   async function handleFile(file: File) {
     setBusy(true);
@@ -170,9 +191,15 @@ function MemberPortraitUploader({
     <div className="team-portrait-uploader">
       <div className="team-portrait-preview">
         {src ? (
-          <a href={src} target="_blank" rel="noopener noreferrer" title="Open full image">
+          <button
+            type="button"
+            className="image-preview-trigger"
+            onClick={openViewer}
+            aria-label={`View full portrait of ${memberName.trim() || 'member'}`}
+            title="Click to view full image"
+          >
             <img src={src} alt={photo?.alt || memberName || 'Member portrait'} />
-          </a>
+          </button>
         ) : (
           <div className="team-portrait-placeholder">
             <SilhouetteIcon size={32} />
@@ -196,9 +223,13 @@ function MemberPortraitUploader({
           />
         </label>
         {src && (
-          <a className="text-button team-portrait-link" href={src} target="_blank" rel="noopener noreferrer">
-            <Icon name="arrow" size={13} /> View full image
-          </a>
+          <button
+            type="button"
+            className="text-button team-portrait-link"
+            onClick={openViewer}
+          >
+            <Icon name="eye" size={14} /> View full image
+          </button>
         )}
         {src && (
           <button
@@ -233,6 +264,7 @@ export default function TeamEditor({
   const [dropIndicator, setDropIndicator] = useState<DropIndicator | null>(null);
   const dropIndicatorRef = useRef<DropIndicator | null>(null);
   const [confirmDeleteGroupId, setConfirmDeleteGroupId] = useState<string | null>(null);
+  const [viewerItem, setViewerItem] = useState<ImageViewerItem | null>(null);
 
   const setDropIndicatorSynced = (next: DropIndicator | null) => {
     dropIndicatorRef.current = next;
@@ -826,15 +858,23 @@ export default function TeamEditor({
                                     </div>
                                   </div>
                                 ) : (
-                                  <button
-                                    type="button"
-                                    className="team-person-info-toggle"
-                                    aria-expanded={isExpanded}
-                                    onClick={() => toggleExpand(member.id)}
-                                  >
+                                  <div className="team-person-edit-lead">
                                     <div className="team-person-thumb">
                                       {thumbSrc ? (
-                                        <img src={thumbSrc} alt={member.photo?.alt || displayName} />
+                                        <button
+                                          type="button"
+                                          className="image-preview-trigger"
+                                          onClick={e => {
+                                            e.stopPropagation();
+                                            setViewerItem(
+                                              buildPortraitViewerItem(thumbSrc, member.photo, displayName)
+                                            );
+                                          }}
+                                          aria-label={`View portrait of ${displayName}`}
+                                          title="Click to view full image"
+                                        >
+                                          <img src={thumbSrc} alt={member.photo?.alt || displayName} />
+                                        </button>
                                       ) : (
                                         <span className="team-thumb-silhouette" aria-hidden="true">
                                           <SilhouetteIcon size={20} />
@@ -842,21 +882,28 @@ export default function TeamEditor({
                                       )}
                                     </div>
 
-                                    <div className="team-person-summary">
-                                      <div className="team-person-title-line">
-                                        <strong className="team-person-name">{displayName}</strong>
-                                        {member.pronouns && (
-                                          <span className="team-person-pronouns">{member.pronouns}</span>
-                                        )}
+                                    <button
+                                      type="button"
+                                      className="team-person-info-toggle"
+                                      aria-expanded={isExpanded}
+                                      onClick={() => toggleExpand(member.id)}
+                                    >
+                                      <div className="team-person-summary">
+                                        <div className="team-person-title-line">
+                                          <strong className="team-person-name">{displayName}</strong>
+                                          {member.pronouns && (
+                                            <span className="team-person-pronouns">{member.pronouns}</span>
+                                          )}
+                                        </div>
+                                        <div className="team-person-meta-line">
+                                          {displayRole && <span className="team-person-role">{displayRole}</span>}
+                                          {member.program && (
+                                            <span className="team-person-program">· {member.program}</span>
+                                          )}
+                                        </div>
                                       </div>
-                                      <div className="team-person-meta-line">
-                                        {displayRole && <span className="team-person-role">{displayRole}</span>}
-                                        {member.program && (
-                                          <span className="team-person-program">· {member.program}</span>
-                                        )}
-                                      </div>
-                                    </div>
-                                  </button>
+                                    </button>
+                                  </div>
                                 )}
 
                                 <div className="team-person-actions">
@@ -950,6 +997,7 @@ export default function TeamEditor({
                                       memberName={member.name}
                                       mode={mode}
                                       onChange={photo => updateMember(group.id, member.id, { photo })}
+                                      onViewImage={setViewerItem}
                                     />
 
                                     <div className="team-person-fields">
@@ -1046,6 +1094,8 @@ export default function TeamEditor({
           })}
         </div>
       )}
+
+      {viewerItem && <ImageViewerModal item={viewerItem} onClose={() => setViewerItem(null)} />}
     </div>
   );
 }
