@@ -1,0 +1,171 @@
+/* Dedicated FAQ editor styling for focused editing and compact within-section rearranging */
+
+.faq-edit-index {
+  min-width: 28px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.faq-rearrange-stack {
+  gap: 10px;
+}
+
+.faq-rearrange-card {
+  position: relative;
+  padding: 10px 12px;
+  border: 1px solid #d8d8d8;
+  background: #fafafa;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  transition:
+    opacity 140ms ease,
+    border-color 140ms ease,
+    background-color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.faq-rearrange-card:hover {
+  border-color: #c2a7b4;
+  background: #fff;
+}
+
+.faq-rearrange-card:active {
+  cursor: grabbing;
+}
+
+.faq-rearrange-card.is-dragging {
+  opacity: 0.42;
+  border-style: dashed;
+  border-color: var(--maroon);
+  background: #faf5f7;
+  cursor: grabbing;
+}
+
+.faq-rearrange-card.is-drop-before,
+.faq-rearrange-card.is-drop-after {
+  border-color: #c493aa;
+}
+
+.faq-rearrange-card.is-drop-before::before,
+.faq-rearrange-card.is-drop-after::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--maroon);
+  box-shadow: 0 0 0 1px #ffffffd9;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.faq-rearrange-card.is-drop-before::before {
+  top: -7px;
+}
+
+.faq-rearrange-card.is-drop-after::before {
+  bottom: -7px;
+}
+
+.faq-rearrange-card.is-drop-before::after,
+.faq-rearrange-card.is-drop-after::after {
+  content: '';
+  position: absolute;
+  left: -4px;
+  width: 9px;
+  height: 9px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: var(--maroon);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.faq-rearrange-card.is-drop-before::after {
+  top: -10px;
+}
+
+.faq-rearrange-card.is-drop-after::after {
+  bottom: -10px;
+}
+
+.faq-rearrange-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.faq-rearrange-row .nested-actions {
+  cursor: default;
+}
+
+.faq-drag-handle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 4px 8px 4px 5px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #6b6b6b;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  flex-shrink: 0;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
+}
+
+.faq-drag-handle:hover {
+  border-color: #dec9d3;
+  background: #f5edf1;
+  color: var(--maroon);
+}
+
+.faq-drag-handle:active,
+.faq-rearrange-card.is-dragging .faq-drag-handle {
+  cursor: grabbing;
+}
+
+.faq-rearrange-summary {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.faq-rearrange-question {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #292929;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.faq-rearrange-snippet {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+@media (max-width: 650px) {
+  .faq-rearrange-row {
+    gap: 6px;
+  }
+
+  .faq-rearrange-snippet {
+    display: none;
+  }
+}

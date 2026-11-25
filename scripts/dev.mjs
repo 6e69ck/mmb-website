@@ -14,6 +14,15 @@ for (let attempt = 0; attempt < 45 && !stopping; attempt++) {
         seeding = spawn('pnpm', ['--filter', '@mmb/admin-dashboard', 'gallery:seed-local'], { stdio: 'inherit' });
         await new Promise(resolve => seeding.on('exit', resolve));
       }
+      const pagesRes = await fetch('http://127.0.0.1:8787/api/admin/pages', { signal: AbortSignal.timeout(1000) });
+      if (pagesRes.ok) {
+        const pagesData = await pagesRes.json();
+        if (Array.isArray(pagesData.pages) && pagesData.pages.some(page => !page.seeded)) {
+          console.log('Preparing editable website pages in local R2 storage…');
+          seeding = spawn('pnpm', ['--filter', '@mmb/admin-dashboard', 'pages:seed-local'], { stdio: 'inherit' });
+          await new Promise(resolve => seeding.on('exit', resolve));
+        }
+      }
       break;
     }
   } catch {}

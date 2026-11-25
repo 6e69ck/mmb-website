@@ -2,6 +2,12 @@ import { useEffect, useRef } from 'react';
 
 type Item = { label: string; href: string; children: Item[] };
 const supportsHoverMenus = () => window.matchMedia('(min-width: 1241px) and (hover: hover) and (pointer: fine)').matches;
+const cleanHref = (href: string) => href === '/' ? '/' : href.replace(/^(\/[^?#]+)\.html(?=$|[?#])/, '$1');
+const cleanTree = (item: Item): Item => ({
+  ...item,
+  href: item.href ? cleanHref(item.href) : '',
+  children: item.children.map(cleanTree),
+});
 
 function MenuItem({ item, current, depth }: { item: Item; current: string; depth: number }) {
   const element = useRef<HTMLLIElement>(null);
@@ -26,7 +32,8 @@ function MenuItem({ item, current, depth }: { item: Item; current: string; depth
       document.removeEventListener('keydown', cancelOnEscape);
     };
   }, [item.children.length]);
-  const active = item.href === current || (item.href === '/gallery.html' && (['/media.html', '/videos.html'].includes(current) || /^\/mmbs-\d{4}\.html$/.test(current)));
+  const normalizedCurrent = cleanHref(current);
+  const active = item.href === normalizedCurrent || (item.href === '/gallery' && (['/media', '/videos'].includes(normalizedCurrent) || /^\/mmbs-\d{4}$/.test(normalizedCurrent)));
   return <li ref={element} className={item.children.length ? 'has-submenu' : ''}
     onPointerEnter={event => {
       clearTimers();
@@ -70,14 +77,16 @@ function Branch({ items, current, depth = 0 }: { items: Item[]; current: string;
 }
 export default function Navigation({ items, current, logo, width, height }: { items: Item[]; current: string; logo: string; width: number; height: number }) {
   const ref = useRef<HTMLElement>(null);
-  const join = items.find(item => item.href === '/join.html');
-  const morePaths = new Set(['/budget.html', '/constitution.html', '/executive-meeting-minutes.html']);
-  const primaryOrder = ['/', '/contact.html', '/faq.html', '/our-team.html', '/alumni.html', '/media.html', '/about.html'];
+  const normalizedItems = items.map(cleanTree);
+  const normalizedCurrent = cleanHref(current);
+  const join = normalizedItems.find(item => item.href === '/join');
+  const morePaths = new Set(['/budget', '/constitution', '/executive-meeting-minutes']);
+  const primaryOrder = ['/', '/contact', '/faq', '/our-team', '/alumni', '/media', '/about'];
   const menuItems = [
-    ...items.filter(item => !morePaths.has(item.href) && item.href !== '/join.html')
+    ...normalizedItems.filter(item => !morePaths.has(item.href) && item.href !== '/join')
       .sort((a, b) => primaryOrder.indexOf(a.href) - primaryOrder.indexOf(b.href))
-      .map(item => item.href === '/media.html' ? { ...item, href: '/gallery.html', children: [] } : item),
-    { label: 'More...', href: '', children: items.filter(item => morePaths.has(item.href)) },
+      .map(item => item.href === '/media' ? { ...item, href: '/gallery', children: [] } : item),
+    { label: 'More...', href: '', children: normalizedItems.filter(item => morePaths.has(item.href)) },
   ];
   useEffect(() => {
     const media = window.matchMedia('(min-width: 1241px)');
@@ -104,7 +113,7 @@ export default function Navigation({ items, current, logo, width, height }: { it
         <summary className="menu-toggle" aria-label="Menu"><span /><span /><span /></summary>
         <nav aria-label="Menu"><Branch items={menuItems} current={current} /></nav>
       </details>
-      {join && <a className="site-join-button" href={join.href} aria-current={current === join.href ? 'page' : undefined}>{join.label}</a>}
+      {join && <a className="site-join-button" href={join.href} aria-current={normalizedCurrent === join.href ? 'page' : undefined}>{join.label}</a>}
     </div>
   </header>;
 }

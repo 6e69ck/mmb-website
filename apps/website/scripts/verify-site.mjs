@@ -47,7 +47,7 @@ for (const page of site.pages) {
   }
   assert.equal(clean(built('.banner-wrap')), clean(original('.banner-wrap')), `${file}: banner text changed`);
   assert.equal(built('.site-footer-bottom p').text(), 'Copyright © 2026 McMaster Marching Band | All Rights Reserved', `${file}: footer date`);
-  for (const href of ['/join.html', '/contact.html', '/gallery.html', '/events.html', '/budget.html', '/constitution.html', '/executive-meeting-minutes.html']) assert.ok(built(`.site-footer a[href="${href}"]`).length, `${file}: useful footer link missing ${href}`);
+  for (const href of ['/join', '/contact', '/gallery', '/events', '/budget', '/constitution', '/executive-meeting-minutes']) assert.ok(built(`.site-footer a[href="${href}"]`).length, `${file}: useful footer link missing ${href}`);
   assert.equal(built('title').text(), original('title').text(), `${file}: title changed`);
   for (const img of built('img').toArray()) {
     const node = built(img);
@@ -63,7 +63,11 @@ for (const page of site.pages) {
   for (const el of built('[href], [data-background-src]').toArray()) {
     const value = built(el).attr('href') || built(el).attr('data-background-src');
     if (value?.startsWith('/original/')) await access(`dist${value}`);
-    else if (value?.startsWith('/') && !value.startsWith('//') && value !== '/') await access(`dist${new URL(value, site.origin).pathname}`);
+    else if (value?.startsWith('/') && !value.startsWith('//') && value !== '/') {
+      const targetPath = new URL(value, site.origin).pathname;
+      const diskPath = targetPath.includes('.') ? `dist${targetPath}` : `dist${targetPath}.html`;
+      await access(diskPath);
+    }
   }
   for (const el of original('#wsite-content form input[name], #wsite-content form textarea[name], #wsite-content form select[name]').toArray()) {
     const name = original(el).attr('name');

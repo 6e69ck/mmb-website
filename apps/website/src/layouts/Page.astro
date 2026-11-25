@@ -14,7 +14,9 @@ import joinGridCss from '../styles/join-grid.css?inline';
 import teamCss from '../styles/team-sections.css?inline';
 import touchNavigationCss from '../styles/navigation-touch.css?inline';
 import faqCss from '../styles/faq-buttons.css?inline';
+import contentBlocksCss from '../styles/content-blocks.css?inline';
 const { page } = Astro.props;
+const canonicalPath = page.path === '/' ? '/' : page.path.replace(/\.html$/, '');
 const logo = images[site.logo as keyof typeof images];
 const isGallery = ['/gallery.html', '/media.html', '/videos.html'].includes(page.path) || /^\/mmbs-\d{4}\.html$/.test(page.path);
 const initialType = page.path === '/videos.html' ? 'videos' : 'all';
@@ -30,7 +32,7 @@ const galleryApiBase = import.meta.env.PUBLIC_GALLERY_API_URL || (import.meta.en
     <meta name="description" content={page.description} />
     <title>{page.title}</title>
     <link rel="icon" type="image/png" href={site.logo} />
-    <link rel="canonical" href={new URL(page.path, Astro.site || site.origin)} />
+    <link rel="canonical" href={new URL(canonicalPath, Astro.site || site.origin)} />
     <script>
       import '../scripts/image-reveal';
     </script>
@@ -43,9 +45,10 @@ const galleryApiBase = import.meta.env.PUBLIC_GALLERY_API_URL || (import.meta.en
     <style is:inline set:html={teamCss} />
     <style is:inline set:html={touchNavigationCss} />
     <style is:inline set:html={faqCss} />
+    <style is:inline set:html={contentBlocksCss} />
   </head>
   <body class={page.bodyClass}>
-    <Navigation items={site.navigation} current={page.path} logo={site.logo} width={logo.width} height={logo.height} client:load />
+    <Navigation items={site.navigation} current={canonicalPath} logo={site.logo} width={logo.width} height={logo.height} client:load />
     <main id="main-content" tabindex="-1" class="main-wrap">
       <Fragment set:html={page.bannerHtml} />
       {isGallery ? <div id="wsite-content" class="wsite-elements wsite-not-footer"><Gallery years={galleryData.years} photoYears={galleryData.photoYears} videoYears={galleryData.videoYears} initialYear={initialYear} initialType={initialType} initialItems={galleryData.albums[String(initialYear) as keyof typeof galleryData.albums] as MediaItem[]} preferredYear={preferredYear} apiBase={galleryApiBase} client:load /></div> : <div id="wsite-content" class="wsite-elements wsite-not-footer" set:html={page.contentHtml} />}

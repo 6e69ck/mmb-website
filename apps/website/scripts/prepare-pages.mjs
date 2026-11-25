@@ -21,7 +21,23 @@ for (const entry of await readdir(originals, { withFileTypes: true })) {
 }
 await writeFile(path.join(output, '_routes.json'), `${JSON.stringify({
   version: 1,
-  include: ['/original/*', '/api/gallery*', '/media/*'],
+  include: [
+    '/original/*',
+    '/api/gallery*',
+    '/api/content/*',
+    '/media/*',
+    '/files/*',
+    '/faq',
+    '/faq.html',
+    '/our-team',
+    '/our-team.html',
+    '/budget',
+    '/budget.html',
+    '/constitution',
+    '/constitution.html',
+    '/executive-meeting-minutes',
+    '/executive-meeting-minutes.html',
+  ],
   exclude: [],
 }, null, 2)}\n`);
 console.log(`Pages staging prepared at ${output}: ${removed} original images will be served from R2; other static assets remain on Pages.`);

@@ -2,3 +2,15 @@
 # Add these through `wrangler secret put` for the production Worker:
 ACCESS_TEAM_DOMAIN=https://YOUR-TEAM.cloudflareaccess.com
 ACCESS_AUD=YOUR-ACCESS-APPLICATION-AUDIENCE
+
+# Separate GitHub repository for page version history (optional locally, falls back to R2 history):
+# CONTENT_GITHUB_REPO=owner/mmb-website-content
+# CONTENT_GITHUB_BRANCH=main
+# CONTENT_GITHUB_TOKEN=github_pat_...
+# Or GitHub App authentication (auto-rotates installation tokens):
+# CONTENT_GITHUB_APP_ID=123456
+# CONTENT_GITHUB_INSTALLATION_ID=789012
+# CONTENT_GITHUB_APP_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
+
+# Google Drive API v3 read-only key for Executive Meeting Minutes auto-sync:
+# GOOGLE_DRIVE_API_KEY=AIza...

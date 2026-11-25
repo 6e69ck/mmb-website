@@ -16,14 +16,14 @@ try {
   await page.route("**/*", route => [new URL(siteOrigin).origin, new URL(mediaOrigin).origin].includes(new URL(route.request().url()).origin) ? route.continue() : route.abort());
   for (const width of focusedTeam ? [320, 1440] : [320, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 900 });
-    for (const path of focusedTeam ? ['/our-team.html'] : ['/', '/join.html', '/our-team.html', '/faq.html', '/gallery.html', '/mmbs-2025.html', '/contact.html', '/budget.html']) {
+    for (const path of focusedTeam ? ['/our-team'] : ['/', '/join', '/our-team', '/faq', '/gallery', '/mmbs-2025', '/contact', '/budget']) {
       const response = await page.goto(`${siteOrigin}${path}`, { waitUntil: 'networkidle' });
       assert.equal(response.status(), 200, `${path} response`);
       await page.waitForSelector('astro-island[component-export="default"]:not([ssr])');
       const overflow = await page.evaluate(() => ({ width: document.documentElement.clientWidth, scroll: document.documentElement.scrollWidth }));
       assert.ok(overflow.scroll <= overflow.width + 1, `${width} ${path} horizontal overflow: ${JSON.stringify(overflow)}`);
       await page.locator('.site-brand img[data-image-ready="true"]').waitFor();
-      if (path === '/contact.html') {
+      if (path === '/contact') {
         const boxes = await page.locator('form').first().evaluate(form => {
           const rect = el => { const box = el.getBoundingClientRect(); return { left: box.left, right: box.right }; };
           return {
@@ -37,7 +37,7 @@ try {
         assert.ok(Math.abs(boxes.last.right - boxes.email.right) < 1, `${width} ${path}: name/email right edges`);
         assert.ok(Math.abs(boxes.message.left - boxes.email.left) < 1 && Math.abs(boxes.message.right - boxes.email.right) < 1, `${width} ${path}: message/email edges`);
       }
-      if (path === '/join.html') {
+      if (path === '/join') {
           assert.equal(await page.locator('#wsite-content form').count(), 0, 'Join must use the Google Form instead of an embedded form');
           const googleForm = page.locator('a.join-google-form-button');
           assert.equal(await googleForm.getAttribute('href'), 'https://forms.gle/DadBMUj3s5rWDKuN9');
@@ -66,7 +66,7 @@ try {
           await page.screenshot({ path: `/tmp/mmb-qa/join-${width}.png`, fullPage: true, animations: 'disabled' });
       }
       if (path === '/') await page.screenshot({ path: `/tmp/mmb-qa/home-${width}.png`, fullPage: true });
-      if (path === '/our-team.html') {
+      if (path === '/our-team') {
         const names = await page.locator('.team-executive-members h2').allTextContents();
         assert.equal(names.length, 5, 'Samara through Mia must share one section');
         for (const [index, name] of ['Samara', 'Norah', 'Alaine', 'Oie', 'Mia'].entries()) assert.ok(names[index].includes(name));
@@ -81,7 +81,7 @@ try {
         await page.locator('.team-leaders').screenshot({ path: `/tmp/mmb-qa/section-leaders-${width}.png`, animations: 'disabled' });
         await page.locator('.team-executive-members').screenshot({ path: `/tmp/mmb-qa/executive-members-${width}.png`, animations: 'disabled' });
       }
-      if (path === '/faq.html') {
+      if (path === '/faq') {
         assert.deepEqual(await page.locator('.faq-audience-button').allTextContents(), ['Students', 'Organizers']);
         for (const button of await page.locator('.faq-audience-button').all()) {
           const box = await button.boundingBox();
@@ -91,7 +91,7 @@ try {
         await page.getByRole('link', { name: 'Organizers', exact: true }).click();
         assert.ok(page.url().endsWith('#organizers'));
       }
-      if (path === '/mmbs-2025.html') {
+      if (path === '/mmbs-2025') {
         await page.screenshot({ path: `/tmp/mmb-qa/gallery-${width}.png`, fullPage: true });
         await page.locator('a[rel^="lightbox"] img').first().click();
         await page.locator('dialog[open]').waitFor();
@@ -100,7 +100,7 @@ try {
         await page.keyboard.press('Escape');
         assert.equal(await page.locator('dialog[open]').count(), 0);
       }
-      if (path === '/gallery.html') {
+      if (path === '/gallery') {
         const selector = page.getByRole('combobox', { name: 'Select gallery year' });
         assert.equal(await selector.inputValue(), '2025');
         assert.ok(await page.getByRole('button', { name: 'Next year', exact: true }).isDisabled());
@@ -140,7 +140,7 @@ try {
     assert.equal(navOrder[navOrder.indexOf('Our Team') + 1], 'Alumni', 'Alumni should immediately follow Our Team');
     assert.equal(navOrder[navOrder.indexOf('Alumni') + 1], 'Media', 'Media should immediately follow Alumni');
     assert.equal(navOrder[navOrder.indexOf('Media') + 1], 'Events', 'Events should follow Media');
-    const media = page.locator('.site-menu > li').filter({ has: page.locator('a[href="/gallery.html"]') });
+    const media = page.locator('.site-menu > li').filter({ has: page.locator('a[href="/gallery"]') });
     assert.equal(await media.locator('details').count(), 0, 'Media should link directly to the gallery');
     assert.ok(await page.locator('.site-join-button').isVisible());
     if (width <= 1240) {
@@ -151,17 +151,17 @@ try {
       await mediaLink.click({ position: { x: box.width - 12, y: box.height / 2 } });
       await page.waitForLoadState('networkidle');
       await page.locator('astro-island:has(.site-header):not([ssr])').waitFor();
-      assert.ok(page.url().endsWith('/gallery.html'));
+      assert.ok(page.url().endsWith('/gallery'));
       if (!await page.locator('.site-navigation').evaluate(el => el.open)) await page.locator('.menu-toggle').click();
     } else {
-      const events = page.locator('.site-menu > li').filter({ has: page.locator('a[href="/about.html"]') });
-      await events.locator('a[href="/about.html"]').hover();
-      await page.waitForFunction(() => document.querySelector('.site-menu a[href="/about.html"]').closest('li').querySelector('details').open);
-      assert.ok(await events.locator('a[href="/events.html"]').isVisible(), 'Hover alone should open the Events dropdown');
+      const events = page.locator('.site-menu > li').filter({ has: page.locator('a[href="/about"]') });
+      await events.locator('a[href="/about"]').hover();
+      await page.waitForFunction(() => document.querySelector('.site-menu a[href="/about"]').closest('li').querySelector('details').open);
+      assert.ok(await events.locator('a[href="/events"]').isVisible(), 'Hover alone should open the Events dropdown');
       await page.keyboard.press('Escape');
     }
     await page.locator('.more-disclosure > summary').click();
-    assert.ok(await page.locator('.site-menu a[href="/budget.html"]').isVisible());
+    assert.ok(await page.locator('.site-menu a[href="/budget"]').isVisible());
     if (width > 1240) {
       const alignment = await page.locator('.more-disclosure').evaluate(el => ({ button: el.querySelector('summary').getBoundingClientRect().left, dropdown: el.querySelector('.site-submenu').getBoundingClientRect().left }));
       assert.ok(Math.abs(alignment.button - alignment.dropdown) < 1, 'Dropdown must align to the left edge of its button');

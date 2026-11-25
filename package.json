@@ -23,7 +23,9 @@
     "deploy:website": "node scripts/deploy-pages.mjs --website",
     "cloudflare:setup": "node scripts/cloudflare-setup.mjs",
     "cloudflare:access": "node scripts/configure-access.mjs",
-    "gallery:seed-local": "pnpm --filter @mmb/admin-dashboard gallery:seed-local"
+    "gallery:seed-local": "pnpm --filter @mmb/admin-dashboard gallery:seed-local",
+    "pages:seed": "pnpm --filter @mmb/admin-dashboard pages:seed",
+    "pages:seed-local": "pnpm --filter @mmb/admin-dashboard pages:seed-local"
   },
   "devDependencies": {
     "turbo": "^2.5.0",

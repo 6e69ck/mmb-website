@@ -8,6 +8,13 @@ export interface Env {
   PUBLIC_MEDIA_ORIGIN: string;
   ACCESS_TEAM_DOMAIN?: string;
   ACCESS_AUD?: string;
+  CONTENT_GITHUB_REPO?: string;
+  CONTENT_GITHUB_BRANCH?: string;
+  CONTENT_GITHUB_TOKEN?: string;
+  CONTENT_GITHUB_APP_ID?: string;
+  CONTENT_GITHUB_APP_PRIVATE_KEY?: string;
+  CONTENT_GITHUB_INSTALLATION_ID?: string;
+  GOOGLE_DRIVE_API_KEY?: string;
 }
 export class ApiError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -35,9 +42,9 @@ export async function boundedBytes(request: Request, maximum: number): Promise<U
   for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
   return bytes;
 }
-export async function bodyJson(request: Request): Promise<Record<string, unknown>> {
+export async function bodyJson(request: Request, maxBytes = 128 * 1024): Promise<Record<string, unknown>> {
   if (!request.headers.get('content-type')?.startsWith('application/json')) throw new ApiError(415, 'Send JSON for this action.');
-  const text = new TextDecoder().decode(await boundedBytes(request, 128 * 1024));
+  const text = new TextDecoder().decode(await boundedBytes(request, maxBytes));
   try { const body = JSON.parse(text); if (!body || typeof body !== 'object' || Array.isArray(body)) throw new Error(); return body; }
   catch { throw new ApiError(400, 'This request contains invalid JSON.'); }
 }

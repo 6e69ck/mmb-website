@@ -65,6 +65,13 @@ function enhance(html) {
       if (/^Email/.test(label)) $(input).attr('type', 'email').attr('autocomplete', 'email');
     });
   });
+  $('a[href]').each((_, el) => {
+    const a = $(el);
+    const href = a.attr('href');
+    if (href && href.startsWith('/') && !href.startsWith('/original/') && !href.startsWith('/files/')) {
+      a.attr('href', href.replace(/^(\/[^?#]+)\.html(?=$|[?#])/, '$1'));
+    }
+  });
   return $.html();
 }
 for (const page of site.pages) {

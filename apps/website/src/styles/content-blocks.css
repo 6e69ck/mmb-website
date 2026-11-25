@@ -1,0 +1,350 @@
+.mmb-anchor-target {
+  display: block;
+  height: 0;
+  scroll-margin-top: 90px;
+}
+
+#wsite-content .mmb-faq-question,
+#wsite-content .mmb-team-name,
+#wsite-content .mmb-minutes-group-heading {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+#wsite-content .mmb-rich-list,
+.mmb-section-subtitle,
+.mmb-image-caption,
+.mmb-team-role,
+.mmb-team-pronouns,
+.mmb-doc-card,
+.mmb-minutes-list,
+.mmb-sponsor-card,
+.mmb-empty-note {
+  font-family: "Montserrat", sans-serif;
+}
+
+.mmb-section-subtitle {
+  margin: 8px 0 20px;
+  color: #555;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+#wsite-content .mmb-rich-list {
+  margin: 12px 0 18px;
+  padding-left: 24px;
+  color: #2a2a2a;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.85;
+}
+
+.mmb-button-secondary {
+  background: #fff !important;
+  color: var(--maroon, #7a003c) !important;
+}
+
+.mmb-button-secondary:hover {
+  background: var(--maroon, #7a003c) !important;
+  color: #fff !important;
+}
+
+.mmb-figure {
+  margin: 0 auto;
+  text-align: center;
+}
+
+.mmb-figure img {
+  display: inline-block;
+  max-width: 100%;
+  height: auto;
+}
+
+.mmb-image-caption {
+  margin-top: 10px;
+  color: #555;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.mmb-divider-wrap {
+  padding: 4px 0;
+}
+
+.mmb-divider-line {
+  border: 0;
+  border-top: 1px solid #d9d9d9;
+  margin: 18px 0;
+}
+
+.mmb-faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.mmb-faq-item {
+  padding-bottom: 4px;
+}
+
+#wsite-content .mmb-faq-question {
+  margin: 0 0 6px;
+  color: #2a2a2a;
+  font-size: 18px;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.mmb-faq-answer .paragraph {
+  margin: 0;
+  color: #333;
+  line-height: 1.7;
+}
+
+.mmb-team-grid {
+  display: grid;
+  gap: 36px 30px;
+  margin-top: 20px;
+}
+
+.mmb-team-executives-grid {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.mmb-team-leaders-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.mmb-team-card {
+  min-width: 0;
+}
+
+.mmb-team-photo img {
+  display: block;
+  width: 100%;
+  max-width: 365px;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  margin: 0 auto 14px;
+}
+
+#wsite-content .mmb-team-name {
+  margin: 14px 0 6px;
+  font-size: 22px;
+  line-height: 1.3;
+  text-align: left;
+}
+
+.mmb-team-pronouns {
+  color: #8c8c8c;
+  font-size: 0.8em;
+  font-weight: 400;
+}
+
+.mmb-team-role {
+  margin: 0 0 10px;
+  color: #767676;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.mmb-team-bio .paragraph {
+  color: #1f1f1f;
+  font-size: 15px;
+  line-height: 1.65;
+  text-align: left;
+}
+
+.mmb-doc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.mmb-doc-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid #dcdcdc;
+  background: #fff;
+}
+
+.mmb-doc-badge {
+  flex-shrink: 0;
+  min-width: 54px;
+  padding: 8px 6px;
+  background: var(--maroon, #7a003c);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+.mmb-doc-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.mmb-doc-title {
+  display: block;
+  color: #222;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.mmb-doc-title:hover {
+  color: var(--maroon, #7a003c);
+  text-decoration: underline;
+}
+
+.mmb-doc-meta {
+  margin-top: 3px;
+  color: #666;
+  font-size: 12px;
+}
+
+.mmb-doc-action,
+.mmb-drive-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 8px 16px;
+  border: 2px solid var(--maroon, #7a003c);
+  background: #fff;
+  color: var(--maroon, #7a003c);
+  font-family: Montserrat, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.mmb-doc-action:hover,
+.mmb-drive-button:hover {
+  background: var(--maroon, #7a003c);
+  color: #fff;
+}
+
+.mmb-drive-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.mmb-drive-folder-link {
+  margin: 0;
+}
+
+.mmb-minutes-group {
+  margin-top: 22px;
+}
+
+.mmb-minutes-group-heading {
+  margin: 0 0 10px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--maroon, #7a003c);
+  color: #292929;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.mmb-minutes-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid #dcdcdc;
+  background: #fff;
+}
+
+.mmb-minutes-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #ececec;
+}
+
+.mmb-minutes-item:last-child {
+  border-bottom: 0;
+}
+
+.mmb-minutes-link {
+  color: #222;
+  font-weight: 600;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.mmb-minutes-link:hover {
+  color: var(--maroon, #7a003c);
+  text-decoration: underline;
+}
+
+.mmb-minutes-meta {
+  color: #666;
+  font-size: 12px;
+}
+
+.mmb-sponsor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px;
+  align-items: center;
+  margin-top: 18px;
+}
+
+.mmb-sponsor-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid #ececec;
+  background: #fff;
+  text-align: center;
+}
+
+.mmb-sponsor-name {
+  color: #555;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.mmb-empty-note {
+  color: #666;
+  font-style: italic;
+}
+
+@media (max-width: 767px) {
+  .mmb-team-leaders-grid {
+    gap: 24px 16px;
+  }
+
+  #wsite-content .mmb-team-leaders-grid .mmb-team-name {
+    font-size: clamp(18px, 5vw, 24px);
+  }
+
+  .mmb-doc-card {
+    flex-wrap: wrap;
+  }
+
+  .mmb-doc-action {
+    width: 100%;
+  }
+}

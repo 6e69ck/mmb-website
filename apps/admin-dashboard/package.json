@@ -11,8 +11,10 @@
     "deploy": "node ../../scripts/deploy-pages.mjs --admin",
     "gallery:migrate": "node scripts/migrate-gallery.mjs",
     "images:migrate": "node scripts/migrate-site-images.mjs",
-    "gallery:seed-local": "node scripts/migrate-gallery.mjs --local"
+    "gallery:seed-local": "node scripts/migrate-gallery.mjs --local",
+    "pages:seed": "node scripts/seed-pages.mjs",
+    "pages:seed-local": "node scripts/seed-pages.mjs --local"
   },
-  "dependencies": { "@mmb/gallery": "workspace:*", "react": "^19.3.1", "react-dom": "^19.3.1", "blurhash": "^2.0.5", "jose": "^6.0.0" },
+  "dependencies": { "@mmb/gallery": "workspace:*", "@mmb/content": "workspace:*", "react": "^19.3.1", "react-dom": "^19.3.1", "blurhash": "^2.0.5", "jose": "^6.0.0" },
   "devDependencies": { "@cloudflare/workers-types": "^5.20261117.1", "@types/react": "^19.3.0", "@types/react-dom": "^19.3.0", "@vitejs/plugin-react": "^5.0.0", "concurrently": "^9.0.0", "typescript": "^6.0.3", "vite": "^7.0.0", "vitest": "^3.0.0", "wrangler": "^4.132.0" }
 }

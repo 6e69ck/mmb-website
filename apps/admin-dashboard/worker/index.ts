@@ -1,9 +1,18 @@
-import { galleryIndex, MEDIA_PREFIX, CATALOG_KEY, type GalleryCatalog, type GalleryItem } from '@mmb/gallery';
+import { galleryIndex, MEDIA_PREFIX, CATALOG_KEY, type GalleryCatalog } from '@mmb/gallery';
 import { authenticate, verifyMutation } from './auth';
 import { loadCatalog, presentItem, sortedItems } from './catalog';
+import {
+  adminContentAssets,
+  adminContentImport,
+  adminDriveSync,
+  adminPages,
+  publicContent,
+  publicContentFile,
+} from './content';
+import { isGitHubConfigured } from './github';
 import { items, safeMediaKey } from './items';
 import { uploads } from './uploads';
-import { ApiError, bodyJson, isLocal, json, type Env } from './types';
+import { ApiError, isLocal, json, type Env } from './types';
 
 const publicHeaders = { 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'no-cache, must-revalidate' };
 async function publicGallery(request: Request, env: Env, path: string) {
@@ -84,18 +93,35 @@ async function localImport(request: Request, env: Env, path: string) {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url), path = url.pathname.replace(/\/$/, '') || '/';
+    const isPublic = path.startsWith('/api/gallery') || path.startsWith('/api/content');
     try {
-      if (request.method === 'OPTIONS' && (path.startsWith('/media/') || path.startsWith('/api/gallery'))) return new Response(null, { status: 204, headers: { ...publicHeaders, 'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS', 'Access-Control-Allow-Headers': 'Range, If-None-Match' } });
+      if (request.method === 'OPTIONS' && (path.startsWith('/media/') || path.startsWith('/files/') || isPublic)) {
+        return new Response(null, { status: 204, headers: { ...publicHeaders, 'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS', 'Access-Control-Allow-Headers': 'Range, If-None-Match' } });
+      }
       if (path === '/api/gallery' || path.startsWith('/api/gallery/years/')) return await publicGallery(request, env, path);
+      if (path.startsWith('/api/content/')) return await publicContent(request, env, path);
       if (path.startsWith(`/${MEDIA_PREFIX}`)) return await media(request, env, path);
+      if (path.startsWith('/files/')) return await publicContentFile(request, env, path);
       // The public media hostname never exposes the admin app or write API.
       if (!isLocal(request, env) && url.origin !== env.ADMIN_ORIGIN) throw new ApiError(404, 'Not found.');
       const email = await authenticate(request, env);
       if (!['GET', 'HEAD'].includes(request.method)) verifyMutation(request, env);
-      if (path === '/api/admin/session' && request.method === 'GET') return json({ email, mediaOrigin: env.PUBLIC_MEDIA_ORIGIN, mode: isLocal(request, env) ? 'local' : 'production' });
+      if (path === '/api/admin/session' && request.method === 'GET') {
+        return json({
+          email,
+          mediaOrigin: env.PUBLIC_MEDIA_ORIGIN,
+          mode: isLocal(request, env) ? 'local' : 'production',
+          githubConfigured: isGitHubConfigured(env),
+          driveConfigured: Boolean(env.GOOGLE_DRIVE_API_KEY?.trim()),
+        });
+      }
       if (path.startsWith('/api/admin/items')) return await items(request, env, path);
       if (path.startsWith('/api/admin/uploads')) return await uploads(request, env, email, path);
       if (path.startsWith('/api/admin/import')) return await localImport(request, env, path);
+      if (path.startsWith('/api/admin/pages')) return await adminPages(request, env, email, path);
+      if (path === '/api/admin/content/assets') return await adminContentAssets(request, env, email, path);
+      if (path === '/api/admin/content/import') return await adminContentImport(request, env, path);
+      if (path.startsWith('/api/admin/drive/')) return await adminDriveSync(request, env, path);
       if (path.startsWith('/api/')) throw new ApiError(404, 'API action not found.');
       if (request.method !== 'GET' && request.method !== 'HEAD') throw new ApiError(405, 'This method is not supported.');
       if (env.ASSETS) {
@@ -109,9 +135,9 @@ export default {
       }
       throw new ApiError(404, 'Not found.');
     } catch (error) {
-      if (error instanceof ApiError) return json({ error: error.message }, error.status, path.startsWith('/api/gallery') ? publicHeaders : {});
-      console.error('Gallery operation failed', error instanceof Error ? error.message : 'Unknown error');
-      return json({ error: 'The gallery service is temporarily unavailable. Please try again.' }, 503, path.startsWith('/api/gallery') ? publicHeaders : {});
+      if (error instanceof ApiError) return json({ error: error.message }, error.status, isPublic ? publicHeaders : {});
+      console.error('Admin worker operation failed', error instanceof Error ? error.message : 'Unknown error');
+      return json({ error: 'The service is temporarily unavailable. Please try again.' }, 503, isPublic ? publicHeaders : {});
     }
   },
 };
